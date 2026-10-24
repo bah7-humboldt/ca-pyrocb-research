@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Patterns · PyroCb Research</title>
+<meta name="description" content="Which 500 hPa weather regimes and documented fire-weather patterns produced pyroCb days on 23 California fires, with composite maps and a mid-level moisture rule.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Weather patterns behind pyroCb days</h1>
+<p class="sub">Every fire day was matched to one of six 500 hPa regimes (A–F), the large-scale height patterns over the
+northeast Pacific and western North America used on the companion
+<a href="https://bah7-humboldt.github.io/ca-ai-ensemble-research/">AI ensemble research viewer</a>. Regimes can be forecast
+days ahead, so they hint at pyroCb potential before a fire's own power is known.</p>
+<div class="card"><h2>Regimes and what the plume did</h2>
+  <p class="note">Lift = how much more often the regime shows up on that class of day than on all studied days (1 = as often as usual).
+  q700 = median 700 hPa specific humidity at the fire (ERA5).</p>
+  <div class="scroll"><table id="rtab"></table></div></div>
+<div class="card"><h2>Regime against mid-level moisture</h2>
+  <p class="note">Every fire day, by regime (jittered sideways) and 700 hPa moisture. PyroCb days need both: one of regimes A, C, D,
+  and moist mid-levels.</p>
+  <div class="controls"><label><input type="checkbox" id="onlycd"> show the rule's cut</label></div>
+  <div class="grid2 wide-left"><div><div id="lg"></div><div class="chart" id="rq"></div></div><div class="detail" id="detail"></div></div></div>
+<div class="card"><h2>Rules from regime and moisture</h2>
+  <p class="note">"Each fire held out" picks the moisture cut without that fire and tests it on that fire, for each fire in turn.</p>
+  <div class="scroll"><table id="rules"></table></div>
+  <p class="note">Useful as an early heads-up, days ahead, before fire power is known. It flags many more days than FP/PFT does on the day.</p></div>
+<h2 style="margin-top:28px">Composite 500 hPa maps</h2>
+<p class="sub">Average height anomaly on each class of day.</p>
+<div class="grid3" id="comps"></div>
+<div class="card"><h2>Documented Northern California patterns</h2>
+  <p class="note">Days flagged with the critical fire-weather patterns from the regional pattern literature (CEFA, Predictive
+  Services). Counts of fire days in each pattern by plume class.</p>
+  <div class="scroll"><table id="pats"></table></div>
+  <p class="note">Five of the nine pyroCb days came while a ridge persisted over the region. Northeast foehn (offshore) days
+  drove some of the largest runs but only one of 27 made a pyroCb.</p></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("patterns.html");
+const S = PYRO.scores, R = ["A", "B", "C", "D", "E", "F"], D = PYRO.days, f = PC.fmt;
+const cbDays = r => D.filter(d => d.cls === "pyroCb" && d.regime === r).map(d => `${PG.fireLabel(d.fire).replace(/ \d{4}$/, "")} ${d.day.slice(5)}`);
+document.getElementById("rtab").innerHTML = `<tr><th>Regime</th><th>Pattern</th><th class="n">PyroCb days</th><th class="n">PyroCb lift</th><th class="n">PyroCu lift</th><th class="n">q700, pyroCb</th><th class="n">q700, no plume</th></tr>` +
+  R.map(r => { const cb = S.regime_by_class.pyroCb[r], cu = S.regime_by_class.pyroCu[r], q = S.q700_median;
+    return `<tr id="regime-${r}"><td><b>${r}</b></td><td style="min-width:260px">${S.regime_descriptions[r]}${cbDays(r).length ? `<br><span class="note">PyroCb: ${cbDays(r).join(", ")}</span>` : ""}</td>
+      <td class="n">${cb.days}</td><td class="n">${cb.lift ? "×" + cb.lift.toFixed(1) : "–"}</td><td class="n">×${cu.lift.toFixed(1)}</td>
+      <td class="n">${q.pyroCb[r] !== null ? q.pyroCb[r].toFixed(1) : "–"}</td><td class="n">${q.none[r] !== null ? q.none[r].toFixed(1) : "–"}</td></tr>`; }).join("");
+if (location.hash.startsWith("#regime-")) { const t = document.querySelector(location.hash); if (t) { t.style.background = "var(--surface-2)"; t.scrollIntoView(); } }
+
+document.getElementById("lg").innerHTML = PC.legend();
+let seed = 3; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647 - 0.5;
+const jit = Object.fromEntries(D.map(d => [d.id, rnd() * 0.6]));
+const qcut = S.regime_rules["regime A, C or D AND q700 >= cut"].pooled_q_cut;
+function drawRQ() {
+  PC.scatter(document.getElementById("rq"), {
+    points: D.filter(d => d.regime && d.q700_era5 !== null).map(d => ({ id: d.id, cls: d.cls, x: R.indexOf(d.regime) + jit[d.id], y: d.q700_era5, html: PG.dayTip(d) })),
+    xLabel: "500 hPa regime", yLabel: "700 hPa moisture (g/kg)", xDomain: [-0.6, 5.6], xTicks: R.map((r, i) => [i, r]),
+    cutY: document.getElementById("onlycd").checked ? qcut : null, cutLabel: `q700 ≥ ${qcut}`,
+    onClick: p => PG.detail(document.getElementById("detail"), PG.byId[p.id]) });
+}
+document.getElementById("onlycd").addEventListener("change", drawRQ);
+PG.detail(document.getElementById("detail"), null); drawRQ();
+
+document.getElementById("rules").innerHTML = `<tr><th>Rule</th><th class="n">q700 cut</th><th class="n">PyroCb caught</th><th class="n">PyroCu flagged</th><th class="n">No-plume flagged</th><th class="n">Each fire held out</th><th class="n">Bal. acc.</th></tr>` +
+  Object.entries(S.regime_rules).map(([k, v]) => `<tr><td>${k.replace(">=", "≥")}</td><td class="n">${v.pooled_q_cut !== null ? v.pooled_q_cut.toFixed(2) + " g/kg" : "–"}</td><td class="n">${v.pooled_pyroCb}</td><td class="n">${v.pooled_pyroCu}</td><td class="n">${v.pooled_none}</td><td class="n">${v.lofo_hit} · ${v.lofo_fa}</td><td class="n">${v.lofo_bal_acc.toFixed(2)}</td></tr>`).join("");
+
+const CN = { pyroCb: "PyroCb days", pyroCu: "PyroCu days", big_none: "Biggest growth days with no deep plume" };
+document.getElementById("comps").innerHTML = Object.entries(S.composites).map(([k, c]) => `<figure class="card" style="margin:0">
+  <img src="${c.img}" alt="Composite 500 hPa height anomaly, ${CN[k] || k}" style="width:100%;border-radius:6px;cursor:zoom-in" loading="lazy" data-zoom>
+  <figcaption><b>${CN[k] || k}</b> (${c.n} days)<br><span class="note">${c.text}</span></figcaption></figure>`).join("");
+const lb = PG.lightbox();
+document.querySelectorAll("[data-zoom]").forEach(i => i.addEventListener("click", () => lb(i.src, i.alt)));
+
+const PN = PG.FLAG;
+document.getElementById("pats").innerHTML = `<tr><th>Pattern</th>${PC.CLS.map(c => `<th class="n">${PC.CLS_NAME[c]}</th>`).join("")}<th class="n">All days</th><th class="n">PyroCb share</th></tr>` +
+  Object.entries(S.patterns_by_class).map(([k, v]) => `<tr><td>${PN[k] || k}</td>${PC.CLS.map(c => `<td class="n">${v[c]}</td>`).join("")}<td class="n">${v.all_days}</td><td class="n">${Math.round(100 * v.pyroCb / v.all_days)}%</td></tr>`).join("");
+</script></body></html>

@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Factor Guide · PyroCb Research</title>
+<meta name="description" content="Every pyroCb factor on this site explained in depth: what it measures, how the study computes it, why it matters, its limits, and the research it comes from.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Factor guide</h1>
+<p class="sub">The <a href="factors.html">Factors</a> page shows each ingredient of a pyroCb day in one line. This page goes
+deeper: what each factor measures, exactly how this study computes it, why the research says it should matter, where it
+breaks down, and the papers it comes from. The "In this study" box on each factor is filled from the study's own
+results.</p>
+
+<div class="card"><h2>Contents</h2><div id="toc"></div></div>
+
+<!-- ============================================================ fire against the air -->
+<h2 style="margin-top:28px" id="fire-vs-air">Fire against the air</h2>
+
+<div class="card" id="g-ratio_max"><h2>Fire power ÷ PFT</h2><div class="score" data-k="ratio_max"></div>
+<p><b>What it is.</b> The fire's convective heat output in a given hour divided by the pyroCb firepower threshold (PFT) of
+the air above it in the same hour, taking the day's highest hourly value. PFT is the least fire power the atmosphere needs
+before a plume can become a pyroCb (see below), so the ratio says how close the fire came to what that day's air required.</p>
+<p><b>How it's computed here.</b> Fire power is GOES fire radiative power (FRP) inside the final perimeter plus about 3 km,
+averaged per hour and multiplied by 3.9 to turn radiated into convective heat: radiation is only a small share of the
+energy a fire releases (Wooster et al. 2005), and Tory &amp; Kepert (2021, appendix D) use the same kind of conversion. PFT
+comes from the HRRR analysis at the day's hot front for the same hour, 12:00–22:00 PDT.</p>
+<p><b>Why it matters.</b> Tory &amp; Kepert (2021) built PFT so that a pyroCb is expected once fire power reaches it, with the
+ratio at 1. Their framework treats the plume as an entraining thermal (Morton et al. 1956) that has to reach the height
+where its added heat and moisture make it freely convective (Tory et al. 2018). Neither the fire nor the atmosphere alone
+decides the outcome; the ratio puts both in one number. That's why it is the best separator here, north and south.</p>
+<p><b>Limits.</b> The study's cut sits near 0.25, not 1: GOES FRP is an hourly snapshot of a fire partly hidden by smoke and
+pixel saturation, the ×3.9 conversion is rough, and PFT assumes an efficient, undiluted plume. Treat 0.25 as this
+pipeline's calibration, not a physical constant.</p>
+<p class="refs"><b>Sources:</b> Tory &amp; Kepert 2021 [TK21]; Tory et al. 2018 [TTK18]; Morton et al. 1956 [MTT56]; Wooster et al. 2005 [W05].</p>
+</div>
+
+<div class="card" id="g-pft_min_gw"><h2>Pyrocumulonimbus firepower threshold (PFT)</h2><div class="score" data-k="pft_min_gw"></div>
+<p><b>What it is.</b> The least fire power, in gigawatts, that the atmosphere needs before a plume can rise to the height
+where it convects freely and grows into a pyroCb. Lower PFT means air more ready for a pyroCb. "No solution" means no fire
+power would do it: the air is too dry or too stable all the way to the −20 °C level.</p>
+<p><b>How it's computed here.</b> The full procedure of Tory &amp; Kepert (2021, section 4), not their shortcut:</p>
+<ol>
+<li>A mixed layer is averaged from the ground up, weighting each height by its distance above the ground (the plume's
+entrainment grows with height), and deepened until its condensation level falls inside it.</li>
+<li>From it, the saturation-point (SP) curve: the cloud bases a plume would reach as the fire adds more heat, with about
+1 g/kg of moisture for every 15 K of warmth from combustion.</li>
+<li>The free-convection point z<sub>fc</sub> is the lowest point on that curve from which a parcel stays warmer than the
+air (by a 1 K buffer) all the way to −20 °C.</li>
+<li>PFT = π c<sub>p</sub> (b′/(1 + a′b′))² ρ<sub>0</sub> z<sub>fc</sub>² U<sub>ML</sub> Δθ<sub>fc</sub>, the paper's
+equation 25.</li>
+</ol>
+<p>The study's code reproduces the paper's Chisholm case (459 vs 520 GW). The day's value is the lowest hourly PFT,
+12:00–22:00 PDT.</p>
+<p><b>Why it matters.</b> It is the atmospheric half of the problem in one number. On its own it misses fires that are too
+small for very receptive air, and it can't tell a quiet day from a pyroCb day in the same air mass.</p>
+<p><b>Limits.</b> PFT is sensitive to boundary-layer moisture and depth, where HRRR has known biases (Dowell et al. 2022).
+Small moisture errors move z<sub>fc</sub>, and PFT goes with z<sub>fc</sub>², so they matter twice.</p>
+<p class="refs"><b>Sources:</b> [TK21]; [TTK18]; Dowell et al. 2022 [D22].</p>
+</div>
+
+<div class="card" id="g-fp_max_gw"><h2>Fire power, peak hour</h2><div class="score" data-k="fp_max_gw"></div>
+<p><b>What it is.</b> The fire's peak hourly convective heat release, in GW, from GOES-West (GOES-16 for the 2018 fires).</p>
+<p><b>How it's computed here.</b> The GOES fire detection product's FRP for every fire pixel inside the perimeter, summed per
+scan, averaged per hour and multiplied by 3.9. Hours missing from the primary satellite's archive are filled from GOES-16,
+scaled by 1.5 to match the primary satellite's view (the ratio found where both saw Dixie).</p>
+<p><b>Why it matters.</b> FRP measures how fast fuel is burning (Wooster et al. 2005): a bigger, hotter fire makes a
+stronger plume. But a pyroCb needs the right air too, so fire power alone separates poorly. Many of the study's biggest
+runs were wind-driven with no deep plume cloud.</p>
+<p><b>Limits.</b> Geostationary FRP misses fire under thick smoke or cloud and saturates over intense fire, so it
+undercounts the most extreme hours. Pixels are about 2 km under the satellite and larger at California's slanted view
+(Schmidt 2020).</p>
+<p class="refs"><b>Sources:</b> [W05]; Schmidt 2020 [S20]; [TK21] appendix D.</p>
+</div>
+
+<!-- ============================================================ atmosphere -->
+<h2 style="margin-top:28px" id="atmosphere">The atmosphere's ingredients</h2>
+
+<div class="card" id="g-pcape_max_jkg"><h2>Pyroconvective CAPE (PCAPE)</h2><div class="score" data-k="pcape_max_jkg"></div>
+<p><b>What it is.</b> The buoyant energy of the pyroCb parcel above its free-convection point: the area between the parcel's
+path and the environment's temperature, from z<sub>fc</sub> to where the parcel stops being buoyant (its equilibrium level),
+in J/kg. Zero when the day has no pyroCb parcel at all.</p>
+<p><b>How it's computed here.</b> R<sub>d</sub>∫(T<sub>v,parcel</sub> − T<sub>v,env</sub>) d ln p from z<sub>fc</sub> to the
+equilibrium level, using the same parcel as PFT and the HRRR column up to 100 hPa. If the parcel is still buoyant at
+100 hPa, the value is a lower bound. The day's value is the largest hourly PCAPE.</p>
+<p><b>Why it matters.</b> It is ordinary CAPE (Moncrieff &amp; Miller 1976; Emanuel 1994) applied to a fire-heated parcel
+instead of a surface one. PFT says how hard it is to <i>start</i> a pyroCb; PCAPE says how vigorously it could grow once
+started. It is not in Tory &amp; Kepert's paper; this study added it, and it is the best of the atmosphere-only measures.</p>
+<p><b>Limits.</b> Like any parcel CAPE it ignores entrainment above z<sub>fc</sub> and condensate weight, so it overstates
+the energy a real plume gets.</p>
+<p class="refs"><b>Sources:</b> Moncrieff &amp; Miller 1976 [MM76]; Emanuel 1994 [E94]; [TK21].</p>
+</div>
+
+<div class="card" id="g-dcape_max_jkg"><h2>Downdraft CAPE (DCAPE)</h2><div class="score" data-k="dcape_max_jkg"></div>
+<p><b>What it is.</b> The energy a parcel of mid-level air gains as it sinks to the ground, kept saturated by rain or ice
+evaporating into it, in J/kg. It measures how strong a downdraft and its gusty outflow at the surface could be.</p>
+<p><b>How it's computed here.</b> MetPy's <code>downdraft_cape</code> on each hourly HRRR column. The parcel starts at the
+lowest equivalent potential temperature in the lowest 400 hPa (the driest air) and descends along its wet-bulb
+pseudo-adiabat to the surface; DCAPE is the area between that path and the environment. The day's value is the largest
+from 12:00 to 22:00 PDT. Every sounding draws the parcel as a green dash-dot line.</p>
+<p><b>Why it matters.</b> High DCAPE marks dry mid-levels over a hot, deep, dry surface layer (Gilmore &amp; Wicker 1998),
+the setup for strong downdrafts and erratic outflow winds when a convective column collapses. For fire crews that is the
+danger of a plume-dominated fire (Rothermel 1991). Here DCAPE runs higher on pyroCb days, but as a pyroCb test it is weak:
+it describes the hazard once convection exists, not whether it forms.</p>
+<p><b>Limits.</b> DCAPE is a ceiling: it assumes enough rain or ice to keep the parcel saturated all the way down, which a
+high-based, dry pyroCb may not have.</p>
+<p class="refs"><b>Sources:</b> Gilmore &amp; Wicker 1998 [GW98]; Rothermel 1991 [R91]; MetPy [M].</p>
+</div>
+
+<div class="card" id="g-z_fc_km"><h2>Free-convection height z<sub>fc</sub></h2><div class="score" data-k="z_fc_km"></div>
+<p><b>What it is.</b> The height above the ground where a fire-heated, moistened parcel becomes freely buoyant all the way to
+−20 °C: the point on the saturation-point curve that the plume has to reach (the star on every sounding).</p>
+<p><b>How it's computed here.</b> As step 3 of PFT above, at the hour of the day's lowest PFT, in km above ground.</p>
+<p><b>Why it matters.</b> A plume dilutes as it rises, entraining the air around it (Morton et al. 1956), so the higher it
+has to go, the more heat it needs: PFT grows with z<sub>fc</sub>². A low z<sub>fc</sub> comes with a moist mixed layer
+and moisture aloft (Lareau &amp; Clements 2016; Tory et al. 2018).</p>
+<p><b>Limits.</b> Defined only when a solution exists; on "no solution" days it is missing, which hides how far from a
+solution the air was.</p>
+<p class="refs"><b>Sources:</b> [TK21]; [TTK18]; [MTT56]; Lareau &amp; Clements 2016 [LC16].</p>
+</div>
+
+<div class="card" id="g-dtheta_fc"><h2>Extra plume warmth Δθ<sub>fc</sub></h2><div class="score" data-k="dtheta_fc"></div>
+<p><b>What it is.</b> How much warmer than the surrounding mixed layer (in potential temperature, K) the plume must be to
+reach z<sub>fc</sub> and convect.</p>
+<p><b>How it's computed here.</b> θ<sub>SP</sub> − θ<sub>ML</sub> at the free-convection point, at the hour of lowest PFT.</p>
+<p><b>Why it matters.</b> PFT is directly proportional to it. Warm, stable layers above the mixed layer force a larger
+Δθ<sub>fc</sub>; a deep, well-mixed afternoon layer with a cool, moist layer aloft keeps it small (Tory &amp; Kepert 2021).</p>
+<p><b>Limits.</b> Very sensitive to the temperature profile just above the mixed layer, where a 3 km model blurs
+inversions.</p>
+<p class="refs"><b>Sources:</b> [TK21]; [TTK18].</p>
+</div>
+
+<div class="card" id="g-u_ml"><h2>Mixed-layer wind U<sub>ML</sub></h2><div class="score" data-k="u_ml"></div>
+<p><b>What it is.</b> The average wind from the ground up to z<sub>fc</sub>, in m/s.</p>
+<p><b>How it's computed here.</b> The magnitude of the height-averaged wind vector over that layer, at the hour of lowest
+PFT.</p>
+<p><b>Why it matters.</b> Wind bends a plume over and mixes in more surrounding air, so a stronger wind demands more fire
+power: PFT is proportional to U<sub>ML</sub> (Tory &amp; Kepert 2021). But wind also drives fast spread and so raises fire
+power, which is why wind alone points both ways. The study's biggest wind-driven runs had no pyroCb.</p>
+<p><b>Limits.</b> One average speed hides shear, which can tilt or tear a plume apart.</p>
+<p class="refs"><b>Sources:</b> [TK21]; [LC16].</p>
+</div>
+
+<div class="card" id="g-q_ml_gkg"><h2>Mixed-layer moisture q<sub>ML</sub></h2><div class="score" data-k="q_ml_gkg"></div>
+<p><b>What it is.</b> The specific humidity of the mixed layer the fire's heat goes into, in g/kg; the day's highest hourly
+value.</p>
+<p><b>How it's computed here.</b> The same height-weighted mixed-layer average PFT uses, from the HRRR analysis at the hot
+front.</p>
+<p><b>Why it matters.</b> Moisture sets the plume's cloud base: a moister mixed layer condenses lower, so the plume reaches
+free convection with less heat. Combustion adds some water, but the environment's moisture usually matters more (Potter
+2005; Luderer et al. 2006). The study's no-plume days had very dry mixed layers (median about 1 g/kg against 4 on pyroCb
+days).</p>
+<p><b>Limits.</b> Model boundary-layer moisture is one of HRRR's weaker fields over complex terrain.</p>
+<p class="refs"><b>Sources:</b> Potter 2005 [P05]; Luderer et al. 2006 [L06]; [TK21]; [D22].</p>
+</div>
+
+<div class="card" id="g-q700_era5"><h2>700 hPa moisture (ERA5)</h2><div class="score" data-k="q700_era5"></div>
+<p><b>What it is.</b> Specific humidity about 3 km up (700 hPa), in g/kg, from the ERA5 reanalysis at the day's hot front.</p>
+<p><b>How it's computed here.</b> ERA5 (Hersbach et al. 2020), the moister of the 18Z and 00Z analyses. The same field is
+forecast days ahead by the global and AI weather ensembles, which is why it was chosen.</p>
+<p><b>Why it matters.</b> California pyroCbs mostly came with mid-level moisture moving north under a hot ridge, the same
+pattern that brings high-based, dry thunderstorms (Rorig &amp; Ferguson 1999). Moist air above the mixed layer lowers
+z<sub>fc</sub> and lets the column grow once it convects (Lareau &amp; Clements 2016). On the
+<a href="patterns.html">Weather patterns</a> page it combines with the weather regime as a days-ahead "pattern allows a
+pyroCb" signal.</p>
+<p><b>Limits.</b> ERA5 is a ~25 km grid; its moisture is a broad-scale view, not the column over the fire.</p>
+<p class="refs"><b>Sources:</b> Hersbach et al. 2020 [H20]; Rorig &amp; Ferguson 1999 [RF99]; [LC16].</p>
+</div>
+
+<!-- ============================================================ fuels -->
+<h2 style="margin-top:28px" id="fuels">Fuels and terrain</h2>
+
+<div class="card" id="g-ahead_avail_kgm2"><h2>Fuel ahead: available fuel</h2><div class="score" data-k="ahead_avail_kgm2"></div>
+<p><b>What it is.</b> The fuel that could burn in a flaming front (kg/m²) on the unburned ground within 5 km of the
+previous day's growth: where the fire was heading.</p>
+<p><b>How it's computed here.</b> LANDFIRE (Rollins 2009) from before the fire: the newest fuel vintage before the fire
+year, with every later disturbance layer up to the year before the fire. Each cell's Scott &amp; Burgan (2005) fuel model
+gives its 1-h, 10-h, live herb and live woody loads, plus canopy fuel where the stand can carry a crown fire (see the
+next factor).</p>
+<p><b>Why it matters.</b> Fuel is the energy available to the plume. It is prognostic: it is known the morning before.</p>
+<p><b>Limits.</b> It barely differs between pyroCb and no-plume days. These are timber fires throughout, so fuel varies
+much less from day to day than the atmosphere does. Fuel-model loads are representative values, not measurements.</p>
+<p class="refs"><b>Sources:</b> Rollins 2009 [R09]; Scott &amp; Burgan 2005 [SB05].</p>
+</div>
+
+<div class="card" id="g-ahead_canopy_load_kgm2"><h2>Fuel ahead: canopy fuel load</h2><div class="score" data-k="ahead_canopy_load_kgm2"></div>
+<p><b>What it is.</b> The crown fuel in the stand ahead of the fire (kg/m²).</p>
+<p><b>How it's computed here.</b> LANDFIRE canopy bulk density × (canopy height − canopy base height). A cell counts as able
+to crown when canopy cover is at least 40%, the canopy base is 2 m or lower and canopy bulk density is at least
+0.10 kg/m³. These are the study's own cut-offs, based on the crown-fire ideas of Scott &amp; Reinhardt (2001).</p>
+<p><b>Why it matters.</b> A crown fire releases far more energy per area than a surface fire, and crown runs feed the
+largest plumes (Rothermel 1991).</p>
+<p><b>Limits.</b> LANDFIRE canopy layers are modelled from satellite and plot data and carry large cell-level error.</p>
+<p class="refs"><b>Sources:</b> Scott &amp; Reinhardt 2001 [SR01]; [R09]; [R91].</p>
+</div>
+
+<div class="card" id="g-ahead_slope_deg"><h2>Fuel ahead: slope</h2><div class="score" data-k="ahead_slope_deg"></div>
+<p><b>What it is.</b> The mean slope (degrees) of the unburned ground within 5 km of the previous day's growth.</p>
+<p><b>How it's computed here.</b> LANDFIRE 2020 terrain over the same cells as the fuel-ahead factors.</p>
+<p><b>Why it matters.</b> Fire spreads faster upslope (Rothermel 1972), so steep ground ahead can raise the day's fire
+power. Terrain also channels winds.</p>
+<p><b>Limits.</b> Mean slope says nothing about aspect or whether the fire is running up or down it.</p>
+<p class="refs"><b>Sources:</b> Rothermel 1972 [R72]; [R09].</p>
+</div>
+
+<div class="card" id="g-burned_avail_kgm2"><h2>Burned that day: available fuel</h2><div class="score" data-k="burned_avail_kgm2"></div>
+<p><b>What it is.</b> The same available-fuel measure as above, but on the ground that actually burned that day.</p>
+<p><b>How it's computed here.</b> The satellite burn-day map (each 100 m cell dated by its first fire detection) overlaid
+on the pre-fire LANDFIRE fuel.</p>
+<p><b>Why it matters.</b> It is the fuel load behind the fuel-based fire power, but known only after the day.</p>
+<p><b>Limits.</b> As for fuel ahead.</p>
+<p class="refs"><b>Sources:</b> [SB05]; [R09].</p>
+</div>
+
+<div class="card" id="g-fuel-compare"><h2>Two ways to turn fuel into fire power: LANDFIRE Scott &amp; Burgan vs FCCS + FOFEM</h2>
+<p>Both start from the same pre-fire LANDFIRE map and the same burned area and burning time; they differ in how much fuel
+they count and whether moisture decides how much of it burns. Both are kept so analysts can compare them.</p>
+<div class="scroll"><table>
+<tr><th></th><th>LANDFIRE Scott &amp; Burgan (fire behavior fuel models)</th><th>LANDFIRE FCCS fuelbeds through FOFEM</th></tr>
+<tr><td>Fuel counted</td><td>1-h, 10-h, live herb and live woody loads of the fuel model, plus canopy fuel where the stand can crown</td>
+  <td>Every FCCS layer: litter, duff, 1/10/100-h, sound and rotten wood 3"+ by size, herbs, shrubs (crown fuel left out of the scored version)</td></tr>
+<tr><td>How much burns</td><td>All of it, always</td><td>What FOFEM predicts burns: Burnup for litter and wood, duff from duff moisture, FOFEM's rules for herbs and shrubs</td></tr>
+<tr><td>Fuel moisture</td><td>Not used</td><td>gridMET 100-h and 1000-h each day (10-h = 100-h − 2; duff = 3 × 1000-h)</td></tr>
+<tr><td>Score, ÷ PFT, each fire held out</td><td class="n" id="cmp-sb">–</td><td class="n" id="cmp-fccs">–</td></tr>
+<tr><td><b>Pros</b></td><td>Simple and transparent; the fuel models fire behavior analysts already use for spread; available everywhere in
+  every LANDFIRE version, so the same numbers come out of FlamMap/FARSITE workflows</td>
+  <td>Counts the heavy fuel and duff that a long, hot run consumes; follows established consumption science; responds to
+  moisture where moisture matters (duff and logs); the better separator here (it catches one more pyroCb day than the satellite ratio)</td></tr>
+<tr><td><b>Cons</b></td><td>Fire behavior fuel models were built to predict spread, not loading: they leave out duff and large
+  wood entirely, so they undercount the energy of timber fires, and they ignore moisture</td>
+  <td>FCCS loadings are mapped by crosswalk from vegetation type and can be far off locally (in a northern Idaho
+  mixed-conifer test, LANDFIRE-FCCS duff ran about 200% above measured loads and FOFEM consumption about 23% high: Hyde et al. 2015); only LF2016, LF2023 and LF2025 vintages; depends on a vendored government program; duff and logs
+  mostly smoulder after the front passes, so part of the counted energy reaches the plume late</td></tr>
+</table></div>
+<p><b>Fuel moisture: integrated, but it barely moves the answer.</b> In the FCCS version moisture is part of the
+calculation, not a test on the side: each day's gridMET moisture picks the consumption FOFEM predicts. Holding moisture
+fixed every day, dry or wet, gives the same score, because every studied day was already dry (gridMET 1000-h 3.8–9.7%)
+and FOFEM's moisture terms act mostly on duff and logs. Live fuel moisture is not used by FOFEM; the study tested a
+live-moisture heat penalty from measured samples (the water in green fuel costs about 2.6 MJ per kg to boil off) and it
+changed fire power by about 4% and the score not at all. The Scott &amp; Burgan version uses no moisture at all. See the
+<a href="#g-moisture-baseline">moisture baseline</a> for what moisture does tell us.</p>
+<p class="refs"><b>Sources:</b> [SB05]; [R09]; Ottmar et al. 2007 [O07]; Riccardi et al. 2007 [RI07]; Reinhardt et al. 1997 [R97];
+Lutes 2020 [L20]; Albini &amp; Reinhardt 1995 [AR95]; Hyde et al. 2015 [H15]; [A13].</p>
+</div>
+
+<div class="card" id="g-fp_fuel_gw"><h2>LANDFIRE fuel fire power (Scott &amp; Burgan)</h2><div class="score" data-k="fp_fuel_gw"></div>
+<p><b>What it is.</b> Fire power estimated from the fuel side instead of the satellite: how much energy the day's burned area
+released and over how long, in GW, using the fire behavior fuel models.</p>
+<p><b>How it's computed here.</b> 0.7 × 15 MJ/kg × available fuel × area burned ÷ burning time (Tory &amp; Kepert 2021,
+appendix D):</p>
+<ul>
+<li><b>15 MJ/kg</b> is the heat a kilogram of fuel releases.</li>
+<li><b>0.7</b> is the share that goes into the plume as convection.</li>
+<li><b>Available fuel</b> is the Scott &amp; Burgan (2005) 1-h, 10-h, live herb and live woody loads plus canopy fuel
+where the stand can crown.</li>
+<li><b>Burning time</b> is the day's total GOES fire energy divided by its peak hourly FRP, at least 3 hours.</li>
+</ul>
+<p>The idea is Byram's fireline intensity (1959) applied to a whole day's area.</p>
+<p><b>Fuel moisture: assumed, not used.</b> All of the available fuel is assumed to burn, and the 15 MJ/kg heat yield
+stands for dry fuel. That is reasonable on the studied days, which were all very dry, but it would overstate fire power
+in moister conditions, when part of the fine fuel and the green shrubs would not burn or would give up heat boiling off
+water.</p>
+<p><b>Why it matters.</b> It can be forecast (forecast spread area × fuel ÷ forecast duration), unlike satellite fire power.
+It is also an independent check on GOES, which misses fire under smoke. It confirmed GOES on the Creek Fire, 5 September.</p>
+<p><b>Limits.</b> Leaves out duff and large wood (see the <a href="#g-fuel-compare">comparison</a>); fuel-model loads are
+representative values, not measurements.</p>
+<p class="refs"><b>Sources:</b> [TK21]; Byram 1959 [B59]; [SB05]; [W05].</p>
+</div>
+
+<div class="card" id="g-ratio_fuel"><h2>LANDFIRE fuel fire power ÷ PFT</h2><div class="score" data-k="ratio_fuel"></div>
+<p><b>What it is.</b> The fuel fire power above divided by the day's lowest PFT: the fire-against-air ratio with fuel
+standing in for the satellite.</p>
+<p><b>How it's computed here.</b> As above, against the day's lowest HRRR PFT.</p>
+<p><b>Why it matters.</b> It is the forecastable version of FP/PFT. The <a href="forecast.html">Forecasting</a> page tests
+it with the previous day's area and the morning HRRR forecast.</p>
+<p><b>Limits.</b> Carries the errors of both the fuel estimate and PFT; the FCCS version below scores better.</p>
+<p class="refs"><b>Sources:</b> [TK21]; [B59].</p>
+</div>
+
+<div class="card" id="g-fofem_fp_surface_gw"><h2>FCCS fuel fire power (FOFEM, surface fuel)</h2><div class="score" data-k="fofem_fp_surface_gw"></div>
+<p><b>What it is.</b> The same fuel-side fire power, but with the fuel that FOFEM says actually burns, from the LANDFIRE
+Fuel Characteristic Classification System (FCCS) fuelbeds.</p>
+<p><b>How it's computed here.</b></p>
+<ol>
+<li><b>Fuelbeds.</b> FCCS (Ottmar et al. 2007; Riccardi et al. 2007) describes each fuelbed by layer: canopy, shrubs, herbs,
+dead wood by size, litter and duff. LANDFIRE maps them: LF2016 for fires through 2023, LF2023 for 2024.</li>
+<li><b>Consumption.</b> The toolkit's copy of SpatialFOFEM, the First Order Fire Effects Model (Reinhardt et al. 1997;
+Lutes 2020), runs once per season on a table of every fuelbed × 10-h moisture (3–16%) × 1000-h moisture (3–30%), for the
+Pacific West region.
+<ul>
+<li>Litter and dead wood consumption comes from the Burnup model (Albini &amp; Reinhardt 1995).</li>
+<li>Duff consumption comes from duff moisture, set to 3 × 1000-h.</li>
+<li>Herbs and shrubs follow FOFEM's rules.</li>
+</ul></li>
+<li><b>Each day.</b> The burned cells take their row of that table at the day's gridMET moisture (Abatzoglou 2013), with
+10-h = 100-h − 2.</li>
+<li><b>Fire power.</b> As for the LANDFIRE version: 0.7 × 15 MJ/kg × consumed surface fuel × area ÷ burning time. Crown
+fuel is left out of this version (FCCS foliage loads are heavy and don't depend on moisture).</li>
+</ol>
+<p><b>Fuel moisture: integrated.</b> Moisture decides how much duff and wood burns. On the studied days it changed little:
+all were dry, and holding moisture fixed gives the same score. Live fuel moisture is not part of FOFEM's consumption
+(see the <a href="#g-fuel-compare">comparison</a>).</p>
+<p><b>Why it matters.</b> Counting the duff, litter and heavy wood that a long timber run consumes makes the fuel side agree
+with the satellite much better than the Scott &amp; Burgan version does.</p>
+<p><b>Limits.</b> FCCS loadings are mapped from vegetation type, not measured; duff and logs partly smoulder after the
+front, so not all of this energy reaches the plume in the same hour. Calculations "provided with the command line
+applications developed by the Missoula Fire Sciences Laboratory, Missoula, MT".</p>
+<p class="refs"><b>Sources:</b> [O07]; [RI07]; [R97]; [L20]; [AR95]; [A13]; [TK21].</p>
+</div>
+
+<div class="card" id="g-ratio_fofem_surface"><h2>FCCS fuel fire power ÷ PFT</h2><div class="score" data-k="ratio_fofem_surface"></div>
+<p><b>What it is.</b> The FCCS fuel fire power divided by the day's lowest PFT.</p>
+<p><b>How it's computed here.</b> As above, against the day's lowest HRRR PFT.</p>
+<p><b>Why it matters.</b> It is the best fuel-based separator in the study, as good as satellite fire power ÷ PFT, and it can
+be forecast once a spread area is forecast.</p>
+<p><b>Limits.</b> As for the FCCS fire power and for PFT.</p>
+<p class="refs"><b>Sources:</b> [TK21]; [R97]; [O07].</p>
+</div>
+
+<!-- ============================================================ moisture -->
+<h2 style="margin-top:28px" id="moisture">Fuel moisture</h2>
+
+<div class="card" id="g-moisture-baseline"><h2>The fuel moisture baseline for a pyroCb</h2>
+<p><b>Why a baseline, not a threshold.</b> Every day in this study is a big fire day (at least 1,000 acres of growth or 3 GW
+of fire power), and all were dry, so moisture hardly separates pyroCb days from the rest. It works as a precondition: pyroCbs
+only happened when fuels were at least this dry. The table gives, for each measure, the range on the 13 pyroCb days, the
+<b>wettest pyroCb day</b> (the edge of the envelope: no pyroCb occurred in moister fuels), how many other big fire days were
+just as dry, and how much of each PSA's June–October record since 2005 is that dry.</p>
+<div class="scroll"><table id="baseline"></table></div>
+<p class="note">Read the edge as "no pyroCb in this study happened in fuels wetter than this", not as a trigger: most days
+that dry made no pyroCb, because the air (PFT) and the fire's power decide. Thirteen pyroCb days is a small sample, and the
+edge is set by a single day.</p>
+<p class="refs"><b>Sources:</b> Bradshaw et al. 1984 [B84]; Jolly et al. 2024 [J24]; [A13]; National Fuel Moisture Database via FEMS [NFMD].</p>
+</div>
+
+<div class="card" id="g-erc_psa"><h2>Energy Release Component (PSA)</h2><div class="score" data-k="erc_psa"></div>
+<p><b>What it is.</b> The NFDRS Energy Release Component: the energy per unit area available at the flaming front, which rises
+as dead and live fuels dry over days to weeks and changes little with daily weather (Bradshaw et al. 1984).</p>
+<p><b>How it's computed here.</b> The ERC for NFDRS 2016 fuel model Y (Jolly et al. 2024), averaged over the RAWS of the fire's
+Predictive Services Area: the same station groups and records behind the ONCC and OSCC fire danger charts.</p>
+<p><b>Why it matters.</b> It is the standard measure of seasonal dryness that analysts already watch, and large-fire activity
+rises with it.</p>
+<p><b>Limits.</b> A PSA average over many stations, some far from the fire; it barely separates pyroCb days from other big fire
+days.</p>
+<p class="refs"><b>Sources:</b> [B84]; [J24].</p>
+</div>
+
+<div class="card" id="g-erc_pct"><h2>ERC percentile</h2><div class="score" data-k="erc_pct"></div>
+<p><b>What it is.</b> Where the day's PSA ERC ranks among all June–October days since 2005 in the same PSA (100 = driest).</p>
+<p><b>How it's computed here.</b> Empirical rank against that PSA's own record, so a coastal and an eastside fire can be compared.</p>
+<p><b>Why it matters.</b> Percentiles are how fire danger is briefed (90th / 97th). Every pyroCb day here was at or above
+roughly the 67th percentile, half of them above the 90th.</p>
+<p><b>Limits.</b> The record starts in 2005; percentiles of a short record move as years are added.</p>
+<p class="refs"><b>Sources:</b> [B84]; [J24].</p>
+</div>
+
+<div class="card" id="g-fm1000_psa"><h2>1000-h fuel moisture (PSA)</h2><div class="score" data-k="fm1000_psa"></div>
+<p><b>What it is.</b> NFDRS moisture of 3–8 inch dead wood, which follows weeks of weather: the slow-drying heavy fuel.</p>
+<p><b>How it's computed here.</b> PSA average of the station NFDRS 1000-h values (fuel model Y).</p>
+<p><b>Why it matters.</b> Heavy dead fuel and duff only burn completely when this is low; it sets how much of a timber fire's
+fuel can feed the fire (Reinhardt et al. 1997).</p>
+<p><b>Limits.</b> As for ERC.</p>
+<p class="refs"><b>Sources:</b> [B84]; [J24]; [R97].</p>
+</div>
+
+<div class="card" id="g-fm100_psa"><h2>100-h fuel moisture (PSA)</h2><div class="score" data-k="fm100_psa"></div>
+<p><b>What it is.</b> NFDRS moisture of 1–3 inch dead wood, responding over a few days.</p>
+<p><b>How it's computed here.</b> PSA average of the station values.</p>
+<p><b>Why it matters.</b> It tracks the recent drying that lets mid-size fuels join the flaming front.</p>
+<p><b>Limits.</b> As for ERC.</p>
+<p class="refs"><b>Sources:</b> [B84]; [J24].</p>
+</div>
+
+<div class="card" id="g-fm1000"><h2>1000-h fuel moisture at the fire (gridMET)</h2><div class="score" data-k="fm1000"></div>
+<p><b>What it is.</b> The 1000-hour dead fuel moisture on gridMET's 4 km grid at the fire's hot front, computed from the
+gridded weather with the NFDRS equations (Abatzoglou 2013).</p>
+<p><b>How it's computed here.</b> The day's value at the cell nearest the hot front. It is the moisture the FCCS/FOFEM fire power
+uses for duff and log consumption.</p>
+<p><b>Why it matters.</b> It is local to the fire, unlike the PSA average, and continuous in space and time.</p>
+<p><b>Limits.</b> Modelled from gridded weather rather than measured; on the studied days it stayed within 3.8–9.7%.</p>
+<p class="refs"><b>Sources:</b> [A13]; [B84].</p>
+</div>
+
+<div class="card" id="g-lfmc_shrub"><h2>Shrub live fuel moisture (field samples)</h2><div class="score" data-k="lfmc_shrub"></div>
+<p><b>What it is.</b> Measured moisture of live shrub foliage, as a percentage of dry weight.</p>
+<p><b>How it's computed here.</b> Field samples from the National Fuel Moisture Database (through FEMS) at every site within 60
+km of the fire, the latest sample per site and species in the 21 days before, averaged over sites. Values outside 30–400%
+are dropped as errors (the database holds "live" conifer samples at 5–10%).</p>
+<p><b>Why it matters.</b> Green fuel burns less readily and gives up heat boiling off its water, about 2.6 MJ per kg of water.</p>
+<p><b>Limits.</b> Samples are every two weeks or so, at a handful of sites, mostly chamise and manzanita; they may not
+represent the fuel the fire is burning. It shows no skill here, and a live-moisture heat penalty changed the fuel fire
+power only about 4%.</p>
+<p class="refs"><b>Sources:</b> [NFMD]; [J24].</p>
+</div>
+
+<!-- ============================================================ observed -->
+<h2 style="margin-top:28px" id="observed">What was observed</h2>
+
+<div class="card" id="g-radar_rooted_top_km"><h2>Radar: fire-rooted plume echo top</h2><div class="score" data-k="radar_rooted_top_km"></div>
+<p><b>What it is.</b> The top of the radar echo column rising from the fire's ash and debris, in km above sea level; the
+day's second-highest scan.</p>
+<p><b>How it's computed here.</b> NEXRAD dual-polarization scans every ~20 minutes. Echo with a correlation coefficient
+below 0.80 is debris, not weather. That boundary is from Kumjian (2013); fire plumes are mostly below 0.4 (Melnikov et al.
+2008). A column counts only if its lowest echo sits on the past hour's GOES fire pixels and it climbs without big gaps.
+Radars badly cluttered by terrain are left out.</p>
+<p><b>Why it matters.</b> Radar sees the plume column directly, through smoke and cloud. A debris column capped by ice
+(correlation 0.95 or more above 6 km) is the pyroCb signature seen from aircraft and radar together (Peterson et al.
+2022). A 10.8 km top separates pyroCb days almost perfectly here, but only on usable radars, and only after the fact. See
+the <a href="radar.html">Radar</a> page.</p>
+<p><b>Limits.</b> Range and terrain: far from the radar the beam is wide and high. It is an observation, not a forecast.</p>
+<p class="refs"><b>Sources:</b> Kumjian 2013 [K13]; Melnikov et al. 2008 [M08]; Peterson et al. 2022 [P22]; Lareau et al. 2022 [L22].</p>
+</div>
+
+<div class="card" id="g-omps_ai_d0"><h2>OMPS aerosol index, same-day pass</h2><div class="score" data-k="omps_ai_d0"></div>
+<p><b>What it is.</b> The peak UV Aerosol Index within 150 km of the fire front on the satellite's ~13:30 local pass.</p>
+<p><b>How it's computed here.</b> The 0–50 "pyrocumulonimbus" aerosol index layer that NASA FIRMS shows, read from NASA
+GIBS. For these fires it is Suomi NPP OMPS, with 50 km pixels.</p>
+<p><b>Why it matters.</b> The index is high where UV-absorbing smoke sits above the scattering atmosphere below, and it
+grows with the smoke's height (Torres et al. 1998). Smoke a pyroCb lifts into the upper troposphere or stratosphere reads
+far above ordinary smoke (Fromm et al. 2010; Peterson et al. 2018).</p>
+<p><b>Limits.</b> At 50 km a single-cell California pyroCb reads like an ordinary smoky day, and regional smoke (September
+2020) pushes no-plume days high. Most pyroCbs form after the 13:30 pass. See the <a href="satellite.html#omps">Satellite</a>
+page.</p>
+<p class="refs"><b>Sources:</b> Torres et al. 1998 [T98]; Fromm et al. 2010 [F10]; Peterson et al. 2018 [P18].</p>
+</div>
+
+<div class="card" id="g-omps_ai_d1"><h2>OMPS aerosol index, next-day pass</h2><div class="score" data-k="omps_ai_d1"></div>
+<p><b>What it is.</b> The peak aerosol index within 500 km of the fire on the next day's pass, when smoke from an afternoon
+pyroCb would first be seen, downwind.</p>
+<p><b>How it's computed here.</b> As for the same-day pass, one day later and over a wider circle.</p>
+<p><b>Why it matters.</b> It catches lofted smoke the same-day pass came too early for.</p>
+<p><b>Limits.</b> A 500 km circle takes in other fires' smoke; it shows no skill here.</p>
+<p class="refs"><b>Sources:</b> [T98]; [F10].</p>
+</div>
+
+<div class="card" id="g-growth_ac"><h2>Satellite growth</h2><div class="score" data-k="growth_ac"></div>
+<p><b>What it is.</b> Acres burned that fire day (06:00 to 06:00 local).</p>
+<p><b>How it's computed here.</b> The toolkit's satellite growth set:</p>
+<ul>
+<li>VIIRS 375 m and MODIS active-fire detections from NASA FIRMS (Schroeder et al. 2014; Giglio et al. 2016), inside the
+fire's MTBS burned-area perimeter (Eidenshink et al. 2007);</li>
+<li>each 100 m cell dated by its first detection;</li>
+<li>for Dixie, a total within 0.1% of MTBS's (381,417 against 381,529 acres).</li>
+</ul>
+<p><b>Why it matters.</b> Big runs and pyroCbs often go together, but the study found that most growth happened on days
+with no pyroCb solution at all: wind-driven, not plume-driven.</p>
+<p><b>Limits.</b> Detections come a few times a day, so very fast runs between passes are dated late. It describes the day
+after the fact.</p>
+<p class="refs"><b>Sources:</b> Schroeder et al. 2014 [S14]; Giglio et al. 2016 [G16]; Eidenshink et al. 2007 [E07].</p>
+</div>
+
+<div class="card" id="refs"><h2>References</h2><ul class="reflist">
+<li id="r-A13">[A13] Abatzoglou, J. T., 2013: Development of gridded surface meteorological data for ecological applications and modelling. <i>International Journal of Climatology</i>, 33, 121–131. <a href="https://doi.org/10.1002/joc.3413">doi:10.1002/joc.3413</a></li>
+<li id="r-AR95">[AR95] Albini, F. A., and E. D. Reinhardt, 1995: Modeling ignition and burning rate of large woody natural fuels. <i>International Journal of Wildland Fire</i>, 5, 81–91. <a href="https://doi.org/10.1071/WF9950081">doi:10.1071/WF9950081</a></li>
+<li id="r-B84">[B84] Bradshaw, L. S., J. E. Deeming, R. E. Burgan and J. D. Cohen, 1984: The 1978 National Fire-Danger Rating System: technical documentation. USDA Forest Service General Technical Report INT-169.</li>
+<li id="r-H15">[H15] Hyde, J. C., E. K. Strand, A. T. Hudak and D. Hamilton, 2015: A case study comparison of LANDFIRE fuel loading and emissions generation on a mixed conifer forest in northern Idaho, USA. <i>Fire Ecology</i>, 11, 108–127. <a href="https://doi.org/10.4996/fireecology.1103108">doi:10.4996/fireecology.1103108</a></li>
+<li id="r-J24">[J24] Jolly, W. M., P. H. Freeborn, L. S. Bradshaw, J. Wallace and S. Brittain, 2024: Modernizing the US National Fire Danger Rating System (version 4): simplified fuel models and improved live and dead fuel moisture calculations. <i>Environmental Modelling &amp; Software</i>, 181, 106181. <a href="https://doi.org/10.1016/j.envsoft.2024.106181">doi:10.1016/j.envsoft.2024.106181</a></li>
+<li id="r-L20">[L20] Lutes, D. C., 2020: FOFEM 6.7 First Order Fire Effects Model user guide. USDA Forest Service, Rocky Mountain Research Station, Missoula Fire Sciences Laboratory.</li>
+<li id="r-NFMD">[NFMD] National Fuel Moisture Database field samples, USDA Forest Service Fire Environment Mapping System (FEMS).</li>
+<li id="r-O07">[O07] Ottmar, R. D., D. V. Sandberg, C. L. Riccardi and S. J. Prichard, 2007: An overview of the Fuel Characteristic Classification System: quantifying, classifying, and creating fuelbeds for resource planning. <i>Canadian Journal of Forest Research</i>, 37, 2383–2393. <a href="https://doi.org/10.1139/X07-077">doi:10.1139/X07-077</a></li>
+<li id="r-R97">[R97] Reinhardt, E. D., R. E. Keane and J. K. Brown, 1997: First Order Fire Effects Model: FOFEM 4.0, user's guide. USDA Forest Service General Technical Report INT-GTR-344.</li>
+<li id="r-RI07">[RI07] Riccardi, C. L., R. D. Ottmar, D. V. Sandberg, A. Andreu, E. Elman, and co-authors, 2007: The fuelbed: a key element of the Fuel Characteristic Classification System. <i>Canadian Journal of Forest Research</i>, 37, 2394–2412. <a href="https://doi.org/10.1139/X07-143">doi:10.1139/X07-143</a></li>
+<li id="r-B59">[B59] Byram, G. M., 1959: Combustion of forest fuels. In <i>Forest Fire: Control and Use</i>, K. P. Davis, Ed., McGraw-Hill.</li>
+<li id="r-D22">[D22] Dowell, D. C., and co-authors, 2022: The High-Resolution Rapid Refresh (HRRR): An hourly updating convection-allowing forecast model. Part I. <i>Weather and Forecasting</i>, 37, 1371–1395. <a href="https://doi.org/10.1175/WAF-D-21-0151.1">doi:10.1175/WAF-D-21-0151.1</a></li>
+<li id="r-E07">[E07] Eidenshink, J., and co-authors, 2007: A project for monitoring trends in burn severity. <i>Fire Ecology</i>, 3, 3–21. <a href="https://doi.org/10.4996/fireecology.0301003">doi:10.4996/fireecology.0301003</a></li>
+<li id="r-E94">[E94] Emanuel, K. A., 1994: <i>Atmospheric Convection</i>. Oxford University Press, 580 pp.</li>
+<li id="r-F10">[F10] Fromm, M., D. T. Lindsey, R. Servranckx, G. Yue, and co-authors, 2010: The untold story of pyrocumulonimbus. <i>Bulletin of the American Meteorological Society</i>, 91, 1193–1210. <a href="https://doi.org/10.1175/2010BAMS3004.1">doi:10.1175/2010BAMS3004.1</a></li>
+<li id="r-G16">[G16] Giglio, L., W. Schroeder and C. O. Justice, 2016: The collection 6 MODIS active fire detection algorithm and fire products. <i>Remote Sensing of Environment</i>, 178, 31–41. <a href="https://doi.org/10.1016/j.rse.2016.02.054">doi:10.1016/j.rse.2016.02.054</a></li>
+<li id="r-GW98">[GW98] Gilmore, M. S., and L. J. Wicker, 1998: The influence of midtropospheric dryness on supercell morphology and evolution. <i>Monthly Weather Review</i>, 126, 943–958. <a href="https://doi.org/10.1175/1520-0493(1998)126%3C0943:TIOMDO%3E2.0.CO;2">doi:10.1175/1520-0493(1998)126&lt;0943:TIOMDO&gt;2.0.CO;2</a></li>
+<li id="r-H20">[H20] Hersbach, H., and co-authors, 2020: The ERA5 global reanalysis. <i>Quarterly Journal of the Royal Meteorological Society</i>, 146, 1999–2049. <a href="https://doi.org/10.1002/qj.3803">doi:10.1002/qj.3803</a></li>
+<li id="r-K13">[K13] Kumjian, M. R., 2013: Principles and applications of dual-polarization weather radar. Part I. <i>Journal of Operational Meteorology</i>, 1, 226–242. <a href="https://doi.org/10.15191/nwajom.2013.0119">doi:10.15191/nwajom.2013.0119</a></li>
+<li id="r-L06">[L06] Luderer, G., J. Trentmann, T. Winterrath, C. Textor, and co-authors, 2006: Modeling of biomass smoke injection into the lower stratosphere by a large forest fire (Part II): sensitivity studies. <i>Atmospheric Chemistry and Physics</i>, 6, 5261–5277. <a href="https://doi.org/10.5194/acp-6-5261-2006">doi:10.5194/acp-6-5261-2006</a></li>
+<li id="r-L22">[L22] Lareau, N. P., A. Donohoe, M. Roberts and H. Ebrahimian, 2022: Tracking wildfires with weather radars. <i>Journal of Geophysical Research: Atmospheres</i>, 127, e2021JD036158. <a href="https://doi.org/10.1029/2021JD036158">doi:10.1029/2021JD036158</a></li>
+<li id="r-LC16">[LC16] Lareau, N. P., and C. B. Clements, 2016: Environmental controls on pyrocumulus and pyrocumulonimbus initiation and development. <i>Atmospheric Chemistry and Physics</i>, 16, 4005–4022. <a href="https://doi.org/10.5194/acp-16-4005-2016">doi:10.5194/acp-16-4005-2016</a></li>
+<li id="r-M">[M] May, R. M., and co-authors: MetPy: a Python package for meteorological data. Unidata. <a href="https://doi.org/10.5065/D6WW7G29">doi:10.5065/D6WW7G29</a></li>
+<li id="r-M08">[M08] Melnikov, V. M., D. S. Zrnić, R. M. Rabin and P. Zhang, 2008: Radar polarimetric signatures of fire plumes in Oklahoma. <i>Geophysical Research Letters</i>, 35, L14815. <a href="https://doi.org/10.1029/2008GL034311">doi:10.1029/2008GL034311</a></li>
+<li id="r-MM76">[MM76] Moncrieff, M. W., and M. J. Miller, 1976: The dynamics and simulation of tropical cumulonimbus and squall lines. <i>Quarterly Journal of the Royal Meteorological Society</i>, 102, 373–394. <a href="https://doi.org/10.1002/qj.49710243208">doi:10.1002/qj.49710243208</a></li>
+<li id="r-MTT56">[MTT56] Morton, B. R., G. Taylor and J. S. Turner, 1956: Turbulent gravitational convection from maintained and instantaneous sources. <i>Proceedings of the Royal Society A</i>, 234, 1–23. <a href="https://doi.org/10.1098/rspa.1956.0011">doi:10.1098/rspa.1956.0011</a></li>
+<li id="r-P05">[P05] Potter, B. E., 2005: The role of released moisture in the atmospheric dynamics associated with wildland fires. <i>International Journal of Wildland Fire</i>, 14, 77–84. <a href="https://doi.org/10.1071/WF04045">doi:10.1071/WF04045</a></li>
+<li id="r-P18">[P18] Peterson, D. A., J. R. Campbell, E. J. Hyer, M. D. Fromm, and co-authors, 2018: Wildfire-driven thunderstorms cause a volcano-like stratospheric injection of smoke. <i>npj Climate and Atmospheric Science</i>, 1. <a href="https://doi.org/10.1038/s41612-018-0039-3">doi:10.1038/s41612-018-0039-3</a></li>
+<li id="r-P22">[P22] Peterson, D. A., and co-authors, 2022: Measurements from inside a thunderstorm driven by wildfire: the 2019 FIREX-AQ field experiment. <i>Bulletin of the American Meteorological Society</i>, 103, E2140–E2167. <a href="https://doi.org/10.1175/BAMS-D-21-0049.1">doi:10.1175/BAMS-D-21-0049.1</a></li>
+<li id="r-R09">[R09] Rollins, M. G., 2009: LANDFIRE: a nationally consistent vegetation, wildland fire, and fuel assessment. <i>International Journal of Wildland Fire</i>, 18, 235–249. <a href="https://doi.org/10.1071/WF08088">doi:10.1071/WF08088</a></li>
+<li id="r-R72">[R72] Rothermel, R. C., 1972: A mathematical model for predicting fire spread in wildland fuels. USDA Forest Service Research Paper INT-115.</li>
+<li id="r-R91">[R91] Rothermel, R. C., 1991: Predicting behavior and size of crown fires in the Northern Rocky Mountains. USDA Forest Service Research Paper INT-438.</li>
+<li id="r-RF99">[RF99] Rorig, M. L., and S. A. Ferguson, 1999: Characteristics of lightning and wildland fire ignition in the Pacific Northwest. <i>Journal of Applied Meteorology</i>, 38, 1565–1575. <a href="https://doi.org/10.1175/1520-0450(1999)038%3C1565:COLAWF%3E2.0.CO;2">doi:10.1175/1520-0450(1999)038&lt;1565:COLAWF&gt;2.0.CO;2</a></li>
+<li id="r-S14">[S14] Schroeder, W., P. Oliva, L. Giglio and I. A. Csiszar, 2014: The new VIIRS 375 m active fire detection data product: algorithm description and initial assessment. <i>Remote Sensing of Environment</i>, 143, 85–96. <a href="https://doi.org/10.1016/j.rse.2013.12.008">doi:10.1016/j.rse.2013.12.008</a></li>
+<li id="r-S20">[S20] Schmidt, C., 2020: GOES-R Advanced Baseline Imager (ABI) Algorithm Theoretical Basis Document for Fire/Hot Spot Characterization. NOAA NESDIS Center for Satellite Applications and Research.</li>
+<li id="r-SB05">[SB05] Scott, J. H., and R. E. Burgan, 2005: Standard fire behavior fuel models: a comprehensive set for use with Rothermel's surface fire spread model. USDA Forest Service General Technical Report RMRS-GTR-153.</li>
+<li id="r-SR01">[SR01] Scott, J. H., and E. D. Reinhardt, 2001: Assessing crown fire potential by linking models of surface and crown fire behavior. USDA Forest Service Research Paper RMRS-RP-29.</li>
+<li id="r-T98">[T98] Torres, O., P. K. Bhartia, J. R. Herman, Z. Ahmad, and co-authors, 1998: Derivation of aerosol properties from satellite measurements of backscattered ultraviolet radiation: theoretical basis. <i>Journal of Geophysical Research</i>, 103, 17099–17110. <a href="https://doi.org/10.1029/98JD00900">doi:10.1029/98JD00900</a></li>
+<li id="r-TK21">[TK21] Tory, K. J., and J. D. Kepert, 2021: Pyrocumulonimbus firepower threshold: assessing the atmospheric potential for pyroCb. <i>Weather and Forecasting</i>, 36, 439–456. <a href="https://doi.org/10.1175/WAF-D-20-0027.1">doi:10.1175/WAF-D-20-0027.1</a></li>
+<li id="r-TTK18">[TTK18] Tory, K. J., W. Thurston and J. D. Kepert, 2018: Thermodynamics of pyrocumulus: a conceptual study. <i>Monthly Weather Review</i>, 146, 2579–2598. <a href="https://doi.org/10.1175/MWR-D-17-0377.1">doi:10.1175/MWR-D-17-0377.1</a></li>
+<li id="r-W05">[W05] Wooster, M. J., G. Roberts, G. L. W. Perry and Y. J. Kaufman, 2005: Retrieval of biomass combustion rates and totals from fire radiative power observations. <i>Journal of Geophysical Research</i>, 110, D24311. <a href="https://doi.org/10.1029/2005JD006318">doi:10.1029/2005JD006318</a></li>
+</ul></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("factors.html");
+const M = PC.M, TH = Object.fromEntries(PYRO.scores.thresholds.map(t => [t.column, t])), D = PYRO.days;
+// medians from the raw values: "inf" (no PFT solution) stays infinite instead of the charts' 3,000 GW stand-in
+const med = a => { const v = a.filter(x => x !== null && x !== undefined && !Number.isNaN(x)).sort((p, q) => p - q);
+  return v.length ? v[Math.floor((v.length - 1) / 2)] : null; };
+const raw = (d, k) => d[k] === "inf" ? Infinity : (typeof d[k] === "number" ? d[k] : null);
+const show = (v, nd, u) => v === null ? "–" : v === Infinity ? "no PFT solution" : PC.fmt(v, nd) + u;
+for (const el of document.querySelectorAll(".score[data-k]")) {
+  const k = el.dataset.k, m = M[k], t = TH[k];
+  if (!m) { el.remove(); continue; }
+  const vals = c => D.filter(d => c(d.cls)).map(d => raw(d, k));
+  const mc = med(vals(c => c === "pyroCb")), mo = med(vals(c => c !== "pyroCb" && c !== "ambiguous"));
+  const u = m.unit ? " " + m.unit : "", nd = m.nd;
+  el.className = "card";
+  el.style.cssText = "background:var(--surface-2);margin:6px 0 12px;padding:10px 14px";
+  el.innerHTML = `<b>In this study</b><div class="kv">` +
+    (t ? `<div class="k">Best cut (all fires)</div><div class="v">${t.higher_is_pyroCb ? "≥" : "≤"} ${PC.fmt(t.pooled_cut, nd + (t.pooled_cut < 1 ? 2 : 0))}${u}</div>
+      <div class="k">Each fire held out</div><div class="v">${t.lofo_hit} pyroCb days caught, ${t.lofo_false_alarm} others flagged; balanced accuracy <b>${PC.fmt(t.lofo_balanced_acc, 2)}</b></div>` : "") +
+    `<div class="k">Median, pyroCb days</div><div class="v">${show(mc, nd, u)}</div>
+     <div class="k">Median, pyroCu and no-plume days</div><div class="v">${show(mo, nd, u)}</div></div>
+     <p class="note" style="margin:6px 0 0"><a href="factors.html#f-${k}">See every day on the Factors page →</a></p>`;
+}
+// moisture baseline table (pyrocb_moisture_baseline.py) and the fuel comparison scores
+const MB = PYRO.scores.moisture_baseline || [];
+if (MB.length) {
+  const pct = v => v === null || v === undefined ? "–" : Math.round(v * 100) + "%";
+  document.getElementById("baseline").innerHTML = `<tr><th>Measure</th><th class="n">pyroCb days: range (median)</th>
+    <th class="n">Envelope edge</th><th class="n">pyroCu days as dry</th><th class="n">No-plume days as dry</th><th class="n">PSA June–Oct record as dry</th></tr>` +
+    MB.map(r => `<tr><td>${r.label}</td><td class="n">${r.pyroCb_min}–${r.pyroCb_max}${r.unit} (${r.pyroCb_median})</td>
+      <td class="n"><b>${r.drier_when === "low" ? "≤" : "≥"} ${r.envelope_edge}${r.unit}</b></td><td class="n">${r.pyroCu_inside}</td>
+      <td class="n">${r.none_inside}</td><td class="n">${pct(r.share_of_psa_season_record_inside)}</td></tr>`).join("");
+}
+for (const [id, k] of [["cmp-sb", "ratio_fuel"], ["cmp-fccs", "ratio_fofem_surface"]]) {
+  const t = TH[k]; if (t) document.getElementById(id).textContent = `${PC.fmt(t.lofo_balanced_acc, 2)} (${t.lofo_hit} caught, ${t.lofo_false_alarm} flagged)`;
+}
+// citation tags link to the reference list
+for (const p of document.querySelectorAll("p.refs")) p.innerHTML = p.innerHTML.replace(/\[([A-Z]+\d*)\]/g, (s, id) =>
+  document.getElementById("r-" + id) ? `<a href="#r-${id}">[${id}]</a>` : s);
+document.getElementById("toc").innerHTML = [...document.querySelectorAll('.card[id^="g-"]')].map(c =>
+  `<a href="#${c.id}" style="display:inline-block;margin:3px 10px 3px 0">${c.querySelector("h2").textContent}</a>`).join("");
+if (location.hash) { const t = document.querySelector(location.hash); if (t) t.scrollIntoView(); }
+</script></body></html>

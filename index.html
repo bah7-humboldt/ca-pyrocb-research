@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyroCb Research · California</title>
+<meta name="description" content="When do California wildfires build their own thunderstorms? An interactive study of 23 large fires across northern and southern California: atmosphere, fire power, fuels, weather patterns and forecasting.">
+<link rel="stylesheet" href="site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1c1 3 4 4 4 8a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7z' fill='%23eb6834'/%3E%3C/svg%3E">
+</head><body><div class="wrap">
+<div class="banner"><b>Experimental research, not a forecast.</b> Built from public data. For official information use the
+<a href="https://www.weather.gov/fire/">NWS fire weather</a> pages and <a href="https://www.nifc.gov/nicc/predictive-services/outlooks">Predictive Services outlooks</a>.</div>
+<h1>When does a California wildfire build its own thunderstorm?</h1>
+<p class="sub">A pyrocumulonimbus (pyroCb) is a thunderstorm made by a fire's own heat. It can loft smoke into the lower
+stratosphere, throw lightning and erratic winds, and make fire behaviour violent and unpredictable. This site follows
+<span id="nfires">23</span> large California fires day by day, <span id="ndays">491</span> fire days in all, and asks what separated the days that made pyroCb
+from the days that didn't: the atmosphere, the fire's power, the fuels, or the weather pattern.</p>
+<div class="tiles" id="tiles"></div>
+<div class="card"><h2>What the colours mean</h2>
+  <p>Each fire day is classed by the coldest cloud top GOES saw rising from the fire between 11 a.m. and 11 p.m.:</p>
+  <ul>
+    <li><span class="badge pyroCb">pyroCb</span> colder than −40 °C: the plume became a thunderstorm.</li>
+    <li><span class="badge pyroCu">pyroCu</span> colder than −20 °C: a deep cumulus cap that stopped short of one.</li>
+    <li><span class="badge ambiguous">ordinary storms over fire</span> ambient thunderstorms over or beside the fire, so the
+      satellite can't tell; left out of every score.</li>
+    <li><span class="badge none">no deep plume cloud</span> the plume's top stayed warmer than −20 °C, or it was smoke only.
+      Not "no plume", and often not a quiet day: the biggest runs of all are here.</li>
+  </ul>
+  <p class="note"><a href="methods.html#classes">Exact rules and what the no-deep-cloud days look like →</a></p></div>
+<div class="card"><h2>What we found</h2><ul id="findings"></ul></div>
+<div class="grid2">
+  <div class="card"><h2>The test that worked</h2>
+    <p>Tory and Kepert (2021) turned pyroCb potential into one number, the <b>pyroCb firepower threshold (PFT)</b>: the least
+    fire heat output the atmosphere needs before a plume can rise, condense and keep going as a thunderstorm.</p>
+    <p class="formula">PFT (GW) ≈ 0.3 × z<sub>fc</sub>² (km) × U<sub>ML</sub> (m/s) × Δθ<sub>fc</sub> (K)</p>
+    <p>z<sub>fc</sub> is how high the plume must rise before it can convect on its own, U<sub>ML</sub> the wind bending it over,
+    Δθ<sub>fc</sub> the extra warmth needed to punch through stable layers. Comparing the fire's measured power with that threshold
+    in the same hour (<b>FP/PFT</b>) separated pyroCb days best, in the north and the south alike.</p>
+    <p><a href="factors.html#calculator">Try the PFT calculator →</a></p></div>
+  <div class="card"><h2>Two roads to a pyroCb</h2>
+    <p><b>Favourable air, modest fire.</b> Dixie, Loyalton, Castle and Line made pyroCbs from 14–76 GW of fire under moist,
+    unstable air (thresholds 6–57 GW), often with monsoon moisture moving north under a hot ridge.</p>
+    <p><b>Big fire, marginal air.</b> Creek, Carr and Sugar mostly made theirs from 110–220 GW of fire against 176–384 GW
+    thresholds (Creek on 6 September, with a threshold of just 25 GW, was the exception).</p>
+    <p>The biggest runs of all were neither: the 8 September 2020 offshore-wind runs (North Complex/Bear 211,000 acres, August
+    Complex 198,000 acres) happened in air too dry for any pyroCb.</p>
+    <p><a href="explore.html">Explore every fire day →</a></p></div>
+</div>
+<div class="card" id="holdup"><h2>Does it hold up?</h2>
+  <p>The first study used seven fires. Sixteen more were then added, eight in the north and eight in the south, and the
+  rules were tried on them <b>without refitting the cuts</b>. Counts are days flagged out of days in each class; ordinary
+  storms over the fire are left out.</p>
+  <div class="controls"><label>Rule <select id="hrule"></select></label></div>
+  <div class="scroll"><table id="htab"></table></div>
+  <p class="note">"North" is the Northern California GACC (ONCC) and "south" the Southern (OSCC). Forecast rules need a
+  morning forecast from the day before, so a fire's first day is left out of them.</p></div>
+<h2 style="margin-top:22px">Explore</h2>
+<div class="navcards">
+  <a href="explore.html"><b>Explore days</b><span>Any two factors against each other, every fire day, with a live threshold tool.</span></a>
+  <a href="factors.html"><b>Factors</b><span>Each ingredient explained and scored, plus the PFT calculator.</span></a>
+  <a href="fires.html"><b>Fires</b><span>Day-by-day timelines for each fire, north and south.</span></a>
+  <a href="patterns.html"><b>Weather patterns</b><span>500 hPa regimes, composite maps and the moisture rule.</span></a>
+  <a href="forecast.html"><b>Forecasting</b><span>What a 5 a.m. forecast would have caught.</span></a>
+  <a href="soundings.html"><b>Soundings</b><span>Skew-T diagrams for pyroCb, pyroCu and no-plume days.</span></a>
+  <a href="satellite.html"><b>Satellite</b><span>The GOES cloud-top panels behind every pyroCb, pyroCu and no-deep-cloud call.</span></a>
+  <a href="radar.html"><b>Radar</b><span>What a pyroCb looks like on weather radar, with famous California fires.</span></a>
+  <a href="methods.html"><b>Methods &amp; sources</b><span>Data, methods, caveats, references and credits.</span></a>
+</div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("index.html");
+const D = PYRO.days, cb = D.filter(d => d.cls === "pyroCb");
+const growth = D.reduce((s, d) => s + (d.growth_ac || 0), 0);
+const nosol = D.filter(d => d.pft_min_gw === "inf").reduce((s, d) => s + (d.growth_ac || 0), 0);
+const cbg = cb.reduce((s, d) => s + (d.growth_ac || 0), 0);
+const rm = PYRO.scores.thresholds.find(t => t.column === "ratio_max");
+const yrs = Object.values(PYRO.fires).map(f => +f.label.slice(-4)).sort();
+document.getElementById("nfires").textContent = Object.keys(PYRO.fires).length;
+document.getElementById("ndays").textContent = D.length;
+const RS = PYRO.scores.regions || [], rules = [...new Set(RS.map(r => r.rule))];
+const hr = document.getElementById("hrule");
+hr.innerHTML = rules.map(r => `<option>${r}</option>`).join("");
+function drawH() {
+  const rows = RS.filter(r => r.rule === hr.value);
+  document.getElementById("htab").innerHTML = `<tr><th>Fires</th><th class="n">pyroCb caught</th><th class="n">pyroCu flagged</th><th class="n">No-plume flagged</th></tr>` +
+    rows.map(r => `<tr><td>${r.group}</td><td class="n">${r.pyroCb}</td><td class="n">${r.pyroCu}</td><td class="n">${r.no_plume}</td></tr>`).join("");
+}
+hr.addEventListener("change", drawH);
+if (rules.length) drawH(); else document.getElementById("holdup").style.display = "none";
+document.getElementById("tiles").innerHTML = [
+  [Object.keys(PYRO.fires).length, `large California fires, ${yrs[0]}–${yrs[yrs.length - 1]}`],
+  [D.length, "fire days studied"],
+  [cb.length, "pyroCb days (cloud tops < −40 °C rooted on the fire)"],
+  [Math.round(100 * nosol / growth) + "%", "of all growth came on days the air couldn't support a pyroCb"],
+  [Math.round(100 * cbg / growth) + "%", "of all growth came on pyroCb days"],
+  [rm ? rm.lofo_hit : "", "pyroCb days caught by FP/PFT when each fire was held out"],
+].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("findings").innerHTML = PYRO.findings.map(t => `<li>${t}</li>`).join("");
+</script></body></html>

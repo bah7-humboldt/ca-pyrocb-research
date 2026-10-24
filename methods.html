@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methods and Sources · PyroCb Research</title>
+<meta name="description" content="Data, methods, caveats, references and data credits for the California pyroCb research site.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Methods &amp; sources</h1>
+<p class="sub">How every number on this site was made, what it can't tell you, and where the data came from.</p>
+
+<div class="card"><h2>Fires and fire days</h2>
+<p>23 large California fires (MTBS events), 2018–2024. The first study (October 2026) used seven: Dixie 2021, Carr 2018,
+Loyalton 2020, North Complex 2020 (including the Bear Fire, which MTBS merges into it), August Complex 2020, Creek 2020 and
+Caldor 2021. Sixteen more were added to test the results, eight in Northern California (Ranch/Mendocino Complex and Camp 2018,
+Hennessey/LNU Complex 2020, Sugar/Beckwourth Complex and Antelope 2021, McKinney and Mosquito 2022, Park 2024) and eight in
+Southern California (Ferguson and Woolsey 2018, Castle/SQF Complex and Bobcat 2020, York 2023, Borel, Bridge and Line 2024),
+mixing fires known for towering plumes with wind-driven ones. A <b>fire day</b> runs 06:00 to 06:00 local time. Days were kept
+when satellite-mapped growth reached 1,000 acres or summed VIIRS/MODIS fire radiative power reached 3,000 MW:
+<span class="ndays">491</span> days in all.</p>
+<p><b>Growth</b> is the area of VIIRS/MODIS active-fire detections inside the final MTBS perimeter, dated to the fire day.</p></div>
+
+<div class="card" id="classes"><h2>What the plume did: the four classes</h2>
+<p>Every fire day gets one class from the GOES-West 10.3 µm cloud-top temperature (GOES-16 for the 2018 fires, before
+GOES-17 became GOES-West; GOES-17 for 2019–2022; GOES-18 from 2023; GOES-16 also fills GOES-17 archive gaps). The scans
+used are every 10 minutes from <b>11:00 to 23:00 PDT</b>. In each scan, a cloud counts as <b>rooted on the fire</b> when
+its connected area of cold pixels reaches within 20 km of a GOES fire pixel from the past hour, after correcting the cloud's
+position for parallax (a tall cloud appears displaced away from the satellite).</p>
+<table>
+<tr><th>Class</th><th>Rule</th><th>What it means</th></tr>
+<tr><td><span class="badge pyroCb">pyroCb</span></td><td>A fire-rooted cloud colder than <b>−40 °C</b> in at least two
+scans, with no other cloud that cold within 100 km.</td><td>The plume made a thunderstorm-depth cloud: below about −40 °C cloud
+water freezes almost completely (the top is glaciated), roughly 9–10 km up in a California summer.</td></tr>
+<tr><td><span class="badge pyroCu">pyroCu</span></td><td>A fire-rooted cloud colder than <b>−20 °C</b> in at least two
+scans, but not a pyroCb.</td><td>The plume made a deep cumulus cap, roughly 7–9 km up, that stopped short of a thunderstorm.</td></tr>
+<tr><td><span class="badge ambiguous">ordinary storms over fire</span></td><td>The cold tops near the fire belong to a wide
+cloud shield (over 1,500 connected pixels below −20 °C with more cold cloud around it), or other −40 °C clouds sit within
+100 km of the fire, or a reviewer saw ordinary storms over or beside the fire.</td><td>A pyroCb could be hiding inside, and satellite can't tell. These days are left out of
+every score (<span id="namb">76</span> days).</td></tr>
+<tr><td><span class="badge none">no deep plume cloud</span></td><td>Everything else: <b>fewer than two scans</b> with a
+fire-rooted cloud colder than −20 °C, and no reviewer finding of one.</td><td>The fire's plume stayed shallow, warmer than
+−20 °C at the top, or was smoke alone. It is <b>not</b> "no plume" and not "a quiet day": many of the biggest runs are in
+this class.</td></tr>
+</table>
+<h3>What "no deep plume cloud" days actually look like</h3>
+<p>The coldest fire-rooted cloud top seen in any scan that day:</p>
+<div class="scroll"><table id="nonebins"></table></div>
+<p class="note" id="nonefacts"></p>
+<p>Every day the automatic rules flagged, and every no-deep-cloud day whose rooted top still reached −10 °C, was then reviewed by
+eye from cloud-top panels (shown in each day's detail); the reviewer's call wins. Limits: the scans stop at 23:00 PDT, so a
+plume that deepened after that (McKinney, 29 July 2022) is caught only if it showed by then, and GOES-17's archive misses
+some late-evening hours in 2020–21.</p></div>
+
+<div class="card"><h2>Fire power and the pyroCb firepower threshold</h2>
+<p><b>Fire power (FP)</b>: GOES fire radiative power within the final fire perimeter (plus a ~3 km buffer), hourly, × 3.9 to convert radiated to
+convective heat (Tory &amp; Kepert 2021). GOES-16 values used to fill GOES-17 gaps were scaled × 1.5, from the median ratio
+where both satellites saw the fire.</p>
+<p><b>PFT</b>: the pyroCb firepower threshold of Tory &amp; Kepert (2021), computed from hourly HRRR analysis soundings at the
+day's most active fire front, 12–22 PDT. It finds the smallest fire power for which a plume, mixed with the entrainment-weighted
+mixed layer, reaches free convection and rises to the −20 °C level. When no plume can do that, PFT has <b>no solution</b>.</p>
+<p class="formula">PFT = 397.3 · ρ₀ · z<sub>fc</sub>² · U<sub>ML</sub> · Δθ<sub>fc</sub> &nbsp;(≈ 0.3 · z² · U · Δθ GW, z in km)</p>
+<p><b>FP/PFT</b> compares the two in the same hour; the day's maximum is used.</p>
+<p><b>Pyroconvective CAPE (PCAPE)</b>: the buoyant energy of that same pyroCb parcel, the area between its path and the
+environment from z<sub>fc</sub> up to its equilibrium level, R<sub>d</sub>∫(T<sub>v,parcel</sub> − T<sub>v,env</sub>) d ln p, in J/kg.
+Days with no PFT solution have PCAPE 0. HRRR columns run from the surface to 100 hPa, above every pyroCb parcel's
+equilibrium level in the study.</p></div>
+
+<div class="card"><h2>Other inputs</h2>
+<ul>
+<li><b>Radar</b>: NEXRAD Level II, the tallest echo column rooted on the fire, every study day 12–23 PDT (see <a href="radar.html">Radar</a>).
+A radar is left out when more than a quarter of its fire's no-plume days read a column of 10.8 km or more: terrain clutter for the
+Hanford (KHNX: Creek, Ferguson) and Sacramento (KDAX: Caldor, Mosquito) radars, and long-range beam blur for Beale (KBBX) on the
+Ranch Fire.</li>
+<li><b>Fuels and terrain</b>: LANDFIRE, matched to before each fire: the newest fuel vintage from before the fire year (LF 2016 for
+2018–2022 fires, LF 2022 for 2023, LF 2023 for 2024) with every later LANDFIRE disturbance layer up to the year before the fire
+masked in, and LF 2020 terrain. Fuel-based fire power = 0.7 × 15 MJ/kg × available fuel × area burned ÷ burning time
+(from GOES timing).</li>
+<li><b>FCCS fuel and consumption</b> (compared side by side with the above): LANDFIRE FCCS fuelbeds (LF2016; LF2023 for 2024
+fires) run through FOFEM (SpatialFOFEM, Burnup for litter and wood, duff from 3 × 1000-h moisture) at each day's gridMET 100-h
+and 1000-h fuel moisture; FCCS fuel fire power = 0.7 × 15 MJ/kg × consumed surface fuel × area ÷ burning time. See the
+<a href="factor-guide.html#g-fuel-compare">Factor guide</a> for the pros and cons of each.</li>
+<li><b>Fuel moisture</b>: NFDRS fuel model Y values (ERC, 100-h, 1000-h, KBDI) averaged over the RAWS of the fire's Predictive
+Services Area, with each day's ERC and 1000-h as percentiles of that PSA's June–October record since 2005; gridMET 100-h and
+1000-h at the fire; and measured live fuel moisture from the National Fuel Moisture Database within 60 km (values outside
+30–400% dropped).</li>
+<li><b>Weather regimes</b>: each day's ERA5 500 hPa height anomaly matched to the six regimes of the
+<a href="https://bah7-humboldt.github.io/ca-ai-ensemble-research/">AI ensemble research viewer</a>; ERA5 700 hPa moisture at the fire;
+documented Northern California critical fire-weather patterns.</li>
+<li><b>Forecast hindcast</b>: HRRR 12Z run, forecast hours 9–15, at the previous day's fire front.</li>
+<li><b>OMPS aerosol index</b>: the 0–50 "pyrocumulonimbus" UV Aerosol Index layer that FIRMS shows, read from NASA GIBS. It is the peak
+within 150 km of the fire front on the fire day's ~13:30 pass, and within 500 km on the next day's pass. The study fires use Suomi NPP
+(50 km pixels); a separate 2025–26 test used NOAA-20 (17 km) and NOAA-21 (12 km). See <a href="satellite.html#omps">Satellite</a>.</li>
+</ul></div>
+
+<div class="card"><h2>Scoring</h2>
+<p>For each factor, the cut that best separates pyroCb days from pyroCu and no-plume days is chosen by balanced accuracy (the mean of the
+hit rate and the correct-rejection rate). <b>Leave-one-fire-out</b> scores choose the cut with one fire held out, test it on that fire, and sum
+over every fire in turn. These are the honest out-of-sample numbers, and the ones shown as "each fire held out".</p></div>
+
+<div class="card"><h2>Caveats</h2><ul id="cav"></ul>
+<ul><li>HRRR has known biases in boundary-layer moisture and depth; PFT is sensitive to both.</li>
+<li>None of this is an operational forecast product.</li></ul></div>
+
+<div class="card"><h2>References</h2><ul>
+<li>Tory, K. J., and J. D. Kepert, 2021: Pyrocumulonimbus firepower threshold: assessing the atmospheric potential for pyroCb.
+<i>Weather and Forecasting</i>. <a href="https://doi.org/10.1175/WAF-D-20-0027.1">doi:10.1175/WAF-D-20-0027.1</a></li>
+<li>Peterson, D. A., and co-authors, 2018: Wildfire-driven thunderstorms cause a volcano-like stratospheric injection of smoke.
+<i>npj Climate and Atmospheric Science</i>. <a href="https://doi.org/10.1038/s41612-018-0039-3">doi:10.1038/s41612-018-0039-3</a></li>
+<li>Peterson, D. A., and co-authors, 2022: Measurements from inside a thunderstorm driven by wildfire: the 2019 FIREX-AQ field experiment.
+<i>Bulletin of the American Meteorological Society</i>. <a href="https://doi.org/10.1175/BAMS-D-21-0049.1">doi:10.1175/BAMS-D-21-0049.1</a></li>
+</ul></div>
+
+<div class="card" id="credits"><h2>Data credits and licences</h2><ul>
+<li>HRRR model analyses and forecasts: NOAA/NCEP, via the NOAA Open Data Dissemination program on AWS.</li>
+<li>GOES-16/17 ABI fire detection (FDC) and cloud and moisture imagery: NOAA, via NOAA Open Data on AWS.</li>
+<li>NEXRAD Level II radar: NOAA National Weather Service, via the Unidata/NOAA Open Data archive on AWS. Decoded with MetPy (Unidata).</li>
+<li>OMPS UV Aerosol Index (Suomi NPP, NOAA-20, NOAA-21): NASA, via the Global Imagery Browse Services (GIBS), part of EOSDIS.</li>
+<li>2025–26 test fire perimeters: NIFC WFIGS Interagency Fire Perimeters (National Interagency Fire Center Open Data).</li>
+<li>GOES-18 and GOES-19 ABI imagery for the 2025–26 test: NOAA, via NOAA Open Data on AWS.</li>
+<li>RAWS hourly weather and NFDRS fire danger indices (fire pages): USDA Forest Service Fire Environment Mapping System (FEMS);
+PSA groupings from the ONCC and OSCC Predictive Services fire danger charts.</li>
+<li>gridMET daily dead fuel moisture (Abatzoglou 2013, <a href="https://doi.org/10.1002/joc.3413">doi:10.1002/joc.3413</a>), University of Idaho / Climatology Lab.</li>
+<li>Map boundaries and towns: Natural Earth (public domain).</li>
+<li>VIIRS and MODIS active fire data: NASA FIRMS (Fire Information for Resource Management System), LANCE/EOSDIS.</li>
+<li>Fire perimeters: Monitoring Trends in Burn Severity (MTBS), USGS and USDA Forest Service.</li>
+<li>Fuels and terrain: LANDFIRE, U.S. Department of the Interior Geological Survey and U.S. Department of Agriculture,
+including the Fuel Characteristic Classification System (FCCS) fuelbeds.</li>
+<li>FCCS fuel consumption: Fire behavior and First Order Fire Effects calculations provided with the command line applications
+developed by the Missoula Fire Sciences Laboratory, Missoula, MT.</li>
+<li>Live fuel moisture samples: National Fuel Moisture Database, via the USDA Forest Service Fire Environment Mapping System (FEMS).</li>
+<li>Contains modified Copernicus Climate Change Service information (2026): ERA5 reanalysis (Hersbach et al. 2020,
+<a href="https://doi.org/10.1002/qj.3803">doi:10.1002/qj.3803</a>). Neither the European Commission nor ECMWF is responsible for any use
+that may be made of the Copernicus information or data it contains.</li>
+</ul>
+<p class="note">Built with public data by an independent analyst. Not reviewed by, and not a product of, any of the agencies above.</p></div>
+
+<div class="card"><h2>Disclaimer</h2>
+<p>Experimental research. Seven fires and nine pyroCb days are a small sample; thresholds and rules here are indicative, not calibrated
+forecasts. For official fire weather information use the National Weather Service and Predictive Services.</p></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("methods.html");
+document.querySelectorAll(".ndays").forEach(e => e.textContent = PYRO.days.length);
+document.getElementById("namb").textContent = PYRO.days.filter(d => d.cls === "ambiguous").length;
+{ // no-deep-plume-cloud breakdown, live from the data
+  const N = PYRO.days.filter(d => d.cls === "none"), t = d => d.bt_rooted_min === null ? 99 : d.bt_rooted_min;
+  const bins = [["warmer than 0 °C (smoke only, or no cloud at all)", d => t(d) >= 0], ["0 to −10 °C", d => t(d) < 0 && t(d) >= -10],
+    ["−10 to −20 °C (shallow cloud caps)", d => t(d) < -10 && t(d) >= -20], ["colder than −20 °C in a single scan, or ruled out on review", d => t(d) < -20]];
+  const g = N.reduce((s, d) => s + (d.growth_ac || 0), 0);
+  document.getElementById("nonebins").innerHTML = `<tr><th>Coldest fire-rooted top</th><th class="n">Days</th><th class="n">Share</th><th class="n">Median growth (ac)</th></tr>` +
+    bins.map(([lab, f]) => { const x = N.filter(f), gr = x.map(d => d.growth_ac || 0).sort((a, b) => a - b);
+      return `<tr><td>${lab}</td><td class="n">${x.length}</td><td class="n">${Math.round(100 * x.length / N.length)}%</td><td class="n">${gr.length ? PC.fmt(gr[gr.length >> 1], 0) : "–"}</td></tr>`; }).join("");
+  const nos = N.filter(d => d.pft_min_gw === "inf").length, big = N.filter(d => (d.growth_ac || 0) >= 50000).length;
+  document.getElementById("nonefacts").textContent = `${N.length} days in all. ${Math.round(100 * nos / N.length)}% had air too dry or stable for a pyroCb at any hour (no PFT solution); ${big} grew 50,000 acres or more.`;
+}
+document.getElementById("cav").innerHTML = PYRO.caveats.map(t => `<li>${t}</li>`).join("");
+if (location.hash) { const t = document.querySelector(location.hash); if (t) t.scrollIntoView(); }
+</script></body></html>

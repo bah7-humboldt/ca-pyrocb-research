@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyroCb on Radar · PyroCb Research</title>
+<meta name="description" content="What a pyrocumulonimbus looks like on NEXRAD weather radar, with radar pictures of every fire in the study, pyroCb days beside the rest.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>What a pyroCb looks like on radar</h1>
+<p class="sub">Weather radar can't see smoke: the particles are far too small. It does see the ash, embers and burnt debris
+that a strong plume lofts, and the rain and ice that form inside a pyroCb. Dual-polarization radar (every NEXRAD site since
+2013) can tell the two apart, so a radar near the fire shows how deep the plume really goes and whether it has turned
+into a thunderstorm.</p>
+
+<div class="card"><h2>What the radar sees</h2>
+<p>A dual-polarization radar sends pulses in two planes, horizontal and vertical, and compares what comes back. Two
+comparisons sort plume from cloud:</p>
+<ul>
+<li><b>Correlation coefficient (CC)</b>: how alike the two returns are from pulse to pulse, 0 to 1. Rain, snow and ice give
+values close to 1; anything ragged, tumbling and mixed in size gives low values.</li>
+<li><b>Differential reflectivity (Z<sub>DR</sub>)</b>: whether targets look wider than they are tall (positive, in dB) or
+taller than wide (negative). Raindrops flatten as they fall, so rain is mildly positive; flat flakes of ash drifting
+broadside are strongly positive.</li>
+</ul>
+<div class="scroll"><table>
+<tr><th>Target</th><th>Reflectivity</th><th class="n">CC</th><th class="n">Z<sub>DR</sub></th><th>Notes</th></tr>
+<tr><td>Smoke</td><td>none</td><td class="n">–</td><td class="n">–</td><td>Particles around a micron across, far too small to return a signal.</td></tr>
+<tr><td><b>Fire plume: ash and debris</b></td><td>weak to moderate (a plume ran 8–15 dB above clear air in Oklahoma)</td>
+  <td class="n"><b>mostly below 0.4</b><br>(median 0.33)</td><td class="n">positive, median +1.4 dB; often above +5, up to +6 dB or more</td>
+  <td>Ragged, randomly tumbling flakes of mixed size. Melnikov et al. (2008); earlier studies quoted by McCarthy et al. (2018) put visible plumes at CC below 0.6.</td></tr>
+<tr><td>Insects and birds</td><td>weak, low down, within about 50–100 km of the radar</td><td class="n">0.5–0.9</td><td class="n">high, often above +6 dB</td>
+  <td>The "clear-air" echo of warm afternoons. Overlaps plume debris in Z<sub>DR</sub>; CC usually sits higher.</td></tr>
+<tr><td>Melting snow (the bright band)</td><td>enhanced</td><td class="n">below 0.90</td><td class="n">raised</td>
+  <td>A horizontal layer near the freezing level (4–5 km in a California summer), not a column.</td></tr>
+<tr><td><b>Rain</b></td><td>moderate to strong</td><td class="n">above 0.98</td><td class="n">near 0 to about +4 dB</td><td>Near-spherical drops; bigger drops flatten more.</td></tr>
+<tr><td>Wet or large hail</td><td>strong</td><td class="n">below 0.95, large hail below 0.85</td><td class="n">variable</td>
+  <td>Can lower CC inside a strong storm core, including a pyroCb's.</td></tr>
+<tr><td><b>Snow and ice</b></td><td>weak to moderate</td><td class="n">above 0.97</td><td class="n">near 0 (higher for pristine crystals)</td>
+  <td>Dry snow and ice stay highly correlated; flat or needle crystals can dip to about 0.96. Kumjian (2013).</td></tr>
+</table></div>
+<p class="note">Values at S-band (NEXRAD) unless noted; any non-weather target (smoke and ash, insects, birds, chaff, ground clutter)
+generally gives CC below about 0.80 (Kumjian 2013).</p>
+<h3>Inside a pyroconvective plume</h3>
+<p>Below cloud base the column is debris: low CC, strongly positive Z<sub>DR</sub>. Above the condensation level, as cloud
+water and then ice take over, <b>CC rises and Z<sub>DR</sub> falls with height</b>; in a well-observed US pyroCb that change, which
+also appeared toward the edges of the deep cloud, went with lightning (Lang et al. 2014, as summarized by McCarthy et al. 2018). A
+column of low-CC debris capped by high-CC ice, rooted on the fire, is the pyroCb signature this page looks for.</p>
+<h3>How this study uses it</h3>
+<ul>
+<li><b>Debris</b>: CC below 0.80 with at least 5 dBZ, Kumjian's boundary for non-weather echoes. That is generous next to
+Melnikov's 0.4 and also admits insects and birds, so a column only counts when its lowest echo sits on the past hour's
+GOES fire pixels and it climbs without big gaps; clear-air insect layers neither start on the fire nor stand 10 km tall.</li>
+<li><b>Ice</b>: CC 0.95 or more above 6 km, above the melting layer where CC drops below 0.90.</li>
+<li><b>Tested.</b> Re-running every radar volume with stricter debris rules barely changed the result. With CC below 0.60
+the 10.8 km test caught 9 of 10 pyroCb days (one slipped from 10.80 to 10.78 km) and the same no-plume day; with
+each fire held out it scored the same as 0.80. Adding Z<sub>DR</sub> of +1 dB or more changed nothing: the plume debris
+already had positive Z<sub>DR</sub>. CC below 0.40, Melnikov's typical plume value, was too strict for NEXRAD's wide
+beams: it broke the columns at their base and lost two pyroCb days (Carr 26 July 2018, Dixie 9 August 2021). The insects
+and birds that the 0.80 rule lets in aren't what makes columns tall.</li>
+</ul>
+<h3>More than plume height</h3>
+<ul>
+<li><b>Where the fire is.</b> The strongest low-level echoes tend to sit over the head and flanks of a running fire. Lareau et al. (2022) turned this into fire perimeters from NEXRAD every ~10 minutes,
+through smoke and cloud, for the Camp Fire and for the Bear run of 8 September 2020 (the North Complex contrast case below),
+and found long-range spotting driving the fastest spread.</li>
+<li><b>Turbulence and rotation.</b> Doppler spectrum width maps turbulence inside the plume, and velocity shows
+convergence and rotating columns (McCarthy et al. 2018, with a mobile X-band radar a few kilometres from Australian fires).</li>
+</ul>
+<h3>The three plume types</h3>
+<div class="chart" style="margin-top:12px"><svg viewBox="0 0 760 270" role="img" aria-label="Three plume types: wind-driven, pyroCu and pyroCb">
+  <g font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="12">
+    <line x1="20" y1="240" x2="740" y2="240" stroke="var(--axis)" stroke-width="2"/>
+    <g fill="var(--muted)"><text x="10" y="244" text-anchor="end">0</text></g>
+    <line x1="30" y1="40" x2="30" y2="240" stroke="var(--grid)"/>
+    <g fill="var(--muted)" font-size="11"><text x="34" y="44">12 km</text><text x="34" y="111">8 km</text><text x="34" y="177">4 km</text></g>
+    <line x1="30" y1="60" x2="740" y2="60" stroke="var(--ink)" stroke-dasharray="5 4" stroke-width="1"/>
+    <text x="80" y="55" fill="var(--ink-2)" font-size="11">10.8 km: the study's pyroCb cut</text>
+    <!-- wind-driven -->
+    <path d="M110 240 C140 215 190 200 250 190 L250 205 C190 214 150 225 130 240 Z" fill="#9c7a4a" opacity="0.85"/>
+    <text x="150" y="262" text-anchor="middle" fill="var(--ink)">Wind-driven run</text>
+    <text x="150" y="176" text-anchor="middle" fill="var(--ink-2)" font-size="11">debris bent over, tops 3–6 km</text>
+    <!-- pyroCu -->
+    <path d="M385 240 L370 150 L400 150 Z" fill="#9c7a4a" opacity="0.85"/>
+    <ellipse cx="388" cy="135" rx="38" ry="22" fill="var(--surface-2)" stroke="var(--axis)"/>
+    <text x="388" y="262" text-anchor="middle" fill="var(--ink)">PyroCu</text>
+    <text x="388" y="102" text-anchor="middle" fill="var(--ink-2)" font-size="11">debris column, cloud cap, tops 6–9 km</text>
+    <!-- pyroCb -->
+    <path d="M610 240 L592 95 L628 95 Z" fill="#9c7a4a" opacity="0.85"/>
+    <path d="M560 92 Q610 38 700 44 L700 62 Q640 66 600 100 Z" fill="var(--c-pyrocu)" opacity="0.8"/>
+    <text x="610" y="262" text-anchor="middle" fill="var(--ink)">PyroCb</text>
+    <text x="700" y="30" text-anchor="end" fill="var(--ink-2)" font-size="11">high-CC ice anvil, 10–12 km</text>
+    <rect x="470" y="160" width="12" height="12" fill="#9c7a4a" opacity="0.85"/><text x="487" y="170" fill="var(--ink-2)" font-size="11">ash/debris (low CC)</text>
+    <rect x="470" y="180" width="12" height="12" fill="var(--c-pyrocu)" opacity="0.8"/><text x="487" y="190" fill="var(--ink-2)" font-size="11">ice/rain (high CC)</text>
+  </g></svg></div>
+<p class="note">Schematic, not to scale horizontally. The heights are typical of the California fires in this study.</p></div>
+
+<div class="card"><h2>How well it works</h2>
+<p>For every fire day with a usable radar, the study traced the tallest echo column rooted on the fire: starting from debris
+at the lowest beam over the fire and climbing through echoes with no big vertical gaps. A column of <b>10.8 km or more</b>
+was the clearest single sign of a pyroCb in the whole study.</p>
+<div class="tiles" id="rtiles"></div>
+<div id="lg"></div><div class="chart" id="rstrip"></div>
+<p class="note">Each dot is a fire day with a usable radar, by what GOES saw at the cloud top. Click a dot for that day.</p></div>
+
+<div class="card" id="browse"><h2>Every fire on radar</h2>
+<p class="note">For each fire: every pyroCb day, the two pyroCu days with the tallest radar column, and the biggest day
+without deep plume cloud. Each picture is one radar volume, at the time the fire's column was tallest that day. <b>a</b>: the
+strongest echo in each column from every tilt, with the final fire perimeter and the past hour's GOES fire pixels. <b>b</b>:
+the echo top. <b>c, d</b>: a vertical slice along the radar beam through the fire (dashed line in a and b), reflectivity
+and correlation coefficient. Below it: the fire's column through the afternoon.</p>
+<div id="browser"></div>
+</div>
+
+<div class="card" id="kinematics"><h2>Downdrafts, outflow and rotation</h2>
+<p>The plume's radial velocity (motion toward or away from the radar) can also show the winds a pyroCb makes. Every
+pyroCb and pyroCu day, plus each fire's biggest day with no deep plume cloud, was searched every 20 minutes from 13:00
+to 21:00 PDT within 15 km of the fire, for three signatures:</p>
+<ul>
+<li><b>Rotation</b>: an inbound-outbound velocity couplet across about 3 km of arc (rotational velocity V<sub>rot</sub>,
+half the difference). NWS guidance treats 10 m/s as weak, 15 as moderate and 20 as strong rotation at short range
+(Brown &amp; Wood 2007).</li>
+<li><b>Low-level outflow (downburst)</b>: divergence along the beam within 2 km of the ground, at least 10 m/s across
+4 km, or 0.0025 s<sup>−1</sup> (Wilson et al. 1984 and Roberts &amp; Wilson 1989, as used by Gibson &amp; Carlin 2025).
+The area-integrated version adds up the divergent area.</li>
+<li><b>Mid-level convergence</b>: convergence 3–7 km above the ground, the inflow that often comes before a downburst
+reaches the surface. Gibson &amp; Carlin (2025) found it at 0.0025 s<sup>−1</sup> or more in 83% of 53 US downbursts.</li>
+</ul>
+<p class="note">No dealiasing: each velocity difference is folded back into ± the Nyquist velocity (24–30 m/s on these
+scans), which works while the true difference is smaller. A signature must hold across a 3 × 3 patch of gates with at
+least 5 dBZ of echo, and the beam must clear the ground by 300 m (beams below the terrain see only clutter).</p>
+<div class="scroll"><table>
+<tr><th>Signature (each day's second-highest scan)</th><th class="n">pyroCb</th><th class="n">pyroCu</th><th class="n">no deep plume cloud</th><th class="n">Each fire held out</th></tr>
+<tr><td>Mid-level convergence ≥ 0.0025 s<sup>−1</sup></td><td class="n">4/13</td><td class="n">3/46</td><td class="n">0/18</td>
+  <td class="n"><b>0.79</b> (9/13 hit, 7/64 false; cut 0.0019 s<sup>−1</sup>)</td></tr>
+<tr><td>Rotation V<sub>rot</sub> ≥ 10 m/s</td><td class="n">4/13</td><td class="n">4/50</td><td class="n">6/21</td>
+  <td class="n">0.65</td></tr>
+<tr><td>Low-level divergence ≥ 0.0025 s<sup>−1</sup> (radar within 100 km)</td><td class="n">5/6</td><td class="n">10/19</td><td class="n">11/13</td>
+  <td class="n">0.59</td></tr>
+</table></div>
+<ul>
+<li><b>Convergence aloft is the one that separates.</b> PyroCb days had a median of 0.0023 s<sup>−1</sup>, against 0.0009 on
+pyroCu days and 0.0012 on no-plume days. That fits the pyroCb drawing air in at mid levels, and a downdraft forming
+in it.</li>
+<li><b>No strong rotation was found.</b> No day reached 15 m/s. Most fires are 50–150 km from their radar (pyroCb days:
+median 100 km), where the beam is 1–2.5 km wide, wider than a fire whirl. The Carr Fire's tornado-strength vortex of
+26 July 2018, about 150 km from the Eureka radar, read under 8 m/s.</li>
+<li><b>Low-level divergence is everywhere</b>: no-plume days reached the downburst threshold as often as pyroCb days,
+from wind over terrain and noisy plume echo. Only six pyroCb days had a radar within 100 km whose beam cleared the
+ground, too few to say more.</li>
+<li><b>Not yet searched:</b> the polarimetric downburst precursors (descending reflectivity and K<sub>DP</sub> cores,
+Z<sub>DR</sub> troughs; Gibson &amp; Carlin 2025, Carlin &amp; Ryzhkov 2025). These are rain and melting signatures; most
+California pyroCbs are high-based and dry.</li>
+</ul>
+</div>
+
+<div class="card"><h2>Limits</h2><ul>
+<li><b>Terrain.</b> Radars looking across the Sierra Nevada see ground clutter that reads as a tall column. In this study
+the Hanford radar (KHNX: Creek, Ferguson) and Sacramento radar (KDAX: Caldor, Mosquito) were unusable for that reason.</li>
+<li><b>Range.</b> At 100 km or more the beam is a kilometre or two wide and starts well above the ground, so plume tops
+blur upward and the base is missed (KBBX for the Ranch Fire).</li>
+<li><b>Ordinary storms.</b> Ice from a thunderstorm drifting over the fire looks like an ice cap on the plume; those days
+are left out of the scoring, as they are for the satellite test. Even a rain core rising above a fire isn't proof: in one
+Australian case the radar saw convective rain over the plume, but the thunderstorm only matured more than 50 km downwind,
+amid other storms (McCarthy et al. 2018).</li>
+<li><b>Clear-air echo.</b> Insects and birds fill the lowest kilometre or two near the radar on warm afternoons with weak,
+low-CC echo that can look like debris. The rooted-column test keeps it out by starting on the fire and requiring a tall,
+continuous column.</li>
+<li><b>Plume drift.</b> At long range the lowest beam is high above the ground and sees debris that has already drifted
+downwind, so echoes sit off the true fire edge (Lareau et al. 2022).</li>
+<li><b>After the fact.</b> Radar confirms a pyroCb as it happens. It doesn't forecast one; see <a href="forecast.html">Forecasting</a>.</li>
+</ul></div>
+
+<div class="card"><h2>Further reading</h2><ul>
+<li>Kumjian, M. R., 2013: Principles and applications of dual-polarization weather radar. Part I: Description of the
+polarimetric radar variables. <i>Journal of Operational Meteorology</i>, 1, 226–242.
+<a href="https://doi.org/10.15191/nwajom.2013.0119">doi:10.15191/nwajom.2013.0119</a> (what CC and Z<sub>DR</sub> mean for each kind of target).</li>
+<li>Melnikov, V. M., D. S. Zrnić, R. M. Rabin and P. Zhang, 2008: Radar polarimetric signatures of fire plumes in Oklahoma.
+<i>Geophysical Research Letters</i>, 35, L14815.
+<a href="https://doi.org/10.1029/2008GL034311">doi:10.1029/2008GL034311</a> (the first dual-pol look at fire plumes: CC mostly below 0.4).</li>
+<li>McCarthy, N., H. McGowan, A. Guyot and A. Dowdy, 2018: Mobile X-pol radar: a new tool for investigating pyroconvection
+and associated wildfire meteorology. <i>Bulletin of the American Meteorological Society</i>, June 2018.
+<a href="https://doi.org/10.1175/BAMS-D-16-0118.1">doi:10.1175/BAMS-D-16-0118.1</a> (plume structure, turbulence and rotation up close).</li>
+<li>Lareau, N. P., A. Donohoe, M. Roberts and H. Ebrahimian, 2022: Tracking wildfires with weather radars.
+<i>Journal of Geophysical Research: Atmospheres</i>, 127, e2021JD036158.
+<a href="https://doi.org/10.1029/2021JD036158">doi:10.1029/2021JD036158</a> (fire perimeters from NEXRAD, Camp and Bear fires).</li>
+<li>Peterson, D. A., and co-authors, 2022: Measurements from inside a thunderstorm driven by wildfire: the 2019 FIREX-AQ field
+experiment. <i>Bulletin of the American Meteorological Society</i>.
+<a href="https://doi.org/10.1175/BAMS-D-21-0049.1">doi:10.1175/BAMS-D-21-0049.1</a> (debris and hydrometeors inside a pyroCb, aircraft and radar together).</li>
+<li>Gibson, M. N., and J. T. Carlin, 2025: Analysis of polarimetric radar downburst precursors using automated storm
+identification and tracking. <i>Weather and Forecasting</i>.
+<a href="https://doi.org/10.1175/WAF-D-24-0222.1">doi:10.1175/WAF-D-24-0222.1</a> (divergence and convergence thresholds, area-integrated divergence).</li>
+<li>Carlin, J. T., and A. V. Ryzhkov, 2025: What can polarimetric radar signatures of developing downbursts reveal about
+their intensity? <i>Journal of the Atmospheric Sciences</i>.
+<a href="https://doi.org/10.1175/JAS-D-25-0014.1">doi:10.1175/JAS-D-25-0014.1</a></li>
+<li>Wang, X., H. Wang, J. He, Z. Shi and C. Xie, 2022: Automated recognition of macro downburst using Doppler weather
+radar. <i>Atmosphere</i>, 13, 672. <a href="https://doi.org/10.3390/atmos13050672">doi:10.3390/atmos13050672</a></li>
+<li>Roberts, R. D., and J. W. Wilson, 1989: A proposed microburst nowcasting procedure using single-Doppler radar.
+<i>Journal of Applied Meteorology</i>, 28, 285–303.
+<a href="https://doi.org/10.1175/1520-0450(1989)028%3C0285:APMNPU%3E2.0.CO;2">doi:10.1175/1520-0450(1989)028&lt;0285:APMNPU&gt;2.0.CO;2</a></li>
+<li>Brown, R. A., and V. T. Wood, 2007: <i>A Guide for Interpreting Doppler Velocity Patterns: Northern Hemisphere
+Edition</i>, 2nd ed. NOAA/National Severe Storms Laboratory.</li>
+</ul>
+<p class="note">Radar data: NOAA NEXRAD Level II via the Unidata/NOAA Open Data archive on AWS, decoded with MetPy.</p></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("radar.html");
+const D = PYRO.days, th = PYRO.scores.thresholds.find(t => t.column === "radar_rooted_top_km");
+const RG = (PYRO.scores.regions || []).filter(r => r.rule.startsWith("radar"));
+const g = n => RG.find(r => r.group.startsWith(n)) || {};
+const tiles = [];
+if (th) tiles.push([th.pooled_hit, "pyroCb days with a 10.8 km+ column (usable radars)"], [th.pooled_false_alarm, "pyroCu and no-plume days that reached it"]);
+if (g("added").pyroCb) tiles.push([g("added").pyroCb, "pyroCb days caught on the 16 added fires, cut not refitted"], [g("added").no_plume, "added fires' no-plume days flagged"]);
+document.getElementById("rtiles").innerHTML = tiles.map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("lg").innerHTML = PC.legend();
+PC.strip(document.getElementById("rstrip"), { points: D.map(d => ({ v: PC.val(d, "radar_rooted_top_km"), cls: d.cls, html: PG.dayTip(d), id: d.id })),
+  log: false, label: "fire-rooted radar column top (km)", cut: 10.8, cutLabel: "≥ 10.8 km",
+  onClick: p => location.href = `explore.html?x=radar_rooted_top_km&y=ratio_max&day=${p.id}` });
+
+const C = (PYRO.radar_cases || []).map(c => ({ ...c, cls: c.cls || "none" }));
+PG.browser(document.getElementById("browser"), {
+  items: C, featured: c => c.featured, featuredLabel: "Featured cases",
+  pane: c => `<h3>${PG.fireLabel(c.fire)} · ${c.day} · ${c.radar} <span class="badge ${c.cls}">${PC.CLS_NAME[c.cls]}</span></h3>
+    <p class="note">${c.caption}${c.usable ? "" : " (this radar was left out of the study's scoring: see Limits)"}${c.top_km ? ` · tallest fire-rooted column ${PC.fmt(c.top_km, 1)} km` : ""}</p>
+    <img src="${c.img}" alt="Radar reflectivity, echo top and vertical slices for ${PG.fireLabel(c.fire)} on ${c.day}" loading="lazy"
+      style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+    ${c.th_img ? `<img src="${c.th_img}" alt="The fire's radar column through the afternoon, ${c.day}" loading="lazy"
+      style="width:100%;margin-top:8px;border-radius:6px;border:1px solid var(--ring);background:#fff">` : ""}
+    <p class="note"><a href="explore.html?x=pft_min_gw&y=fp_max_gw&day=${c.id}">This day's numbers →</a> ·
+      <a href="satellite.html?case=${c.id}">satellite</a> · <a href="soundings.html?case=${c.id}">sounding</a></p>`,
+});
+</script></body></html>
