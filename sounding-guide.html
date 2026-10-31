@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sounding Guide · PyroCb Research</title>
+<meta name="description" content="How the site's HRRR soundings and the numbers in their boxes are made, and what the example soundings by plume class show.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Sounding guide</h1>
+<p class="sub">How each sounding on this site is made, what the numbers in its box mean, and what the example soundings by
+plume class show. The <a href="soundings.html">Soundings</a> page explains how to read the chart itself.</p>
+
+<div class="card" id="single"><h2>A single day's sounding</h2>
+<ul>
+<li><b>Where:</b> the HRRR model's hourly analysis (its 3 km grid, the 5 × 5 cells around the point) at the fire's
+<b>hot front</b> that day, where the most fire power was detected by satellite. The <a href="fires.html">Fires</a> pages map
+each day's hot front.</li>
+<li><b>When:</b> the hour the fire came closest to its pyroCb threshold, the highest FP/PFT of the afternoon. If there was no
+fire-power reading, the hour of lowest PFT; if neither exists, 15:00 PDT.</li>
+<li><b>How high:</b> from the ground to 100 hPa, about 16 km.</li>
+<li>HRRR describes the air <i>around</i> the fire, not inside the plume, so it shows what the fire had to work with.</li>
+</ul>
+<h3>The numbers in the box</h3>
+<div class="scroll"><table>
+<tr><th>Number</th><th>What it is</th></tr>
+<tr><td>PFT</td><td>Pyrocumulonimbus firepower threshold (Tory &amp; Kepert 2021): the least fire power, in GW, that can carry a
+plume to z<sub>fc</sub> against the wind and still convect. "No pyroCb solution" means no amount of fire power would.</td></tr>
+<tr><td>z<sub>fc</sub>, Δθ<sub>fc</sub></td><td>The height above ground where the plume becomes free to convect, and how much
+warmer than the mixed layer it must be to get there.</td></tr>
+<tr><td>U<sub>ML</sub></td><td>The mean wind through the mixed layer, which bends the plume over.</td></tr>
+<tr><td>PCAPE</td><td>Pyroconvective CAPE: the plume parcel's buoyant energy from z<sub>fc</sub> to where it stops rising (J/kg).</td></tr>
+<tr><td>DCAPE</td><td>Downdraft CAPE: the energy a parcel of mid-level air gains sinking to the ground, kept saturated by evaporating
+rain or ice (J/kg). It starts at the driest point (lowest equivalent potential temperature) in the lowest 400 hPa. High DCAPE
+means strong downdrafts and gusty, erratic outflow winds are possible, a hazard under any collapsing pyroCb or pyroCu. Computed
+with MetPy's <code>downdraft_cape</code> (after Gilmore &amp; Wicker 1998).</td></tr>
+<tr><td>q<sub>ML</sub>, ML top</td><td>Moisture and depth of the mixed layer.</td></tr>
+<tr><td>FP/PFT and the rest</td><td>What the fire actually did that day: fire power against threshold, peak fire power,
+the coldest cloud top GOES saw over the fire, and the growth.</td></tr>
+</table></div>
+</div>
+
+<div class="card" id="examples"><h2>The example soundings by plume class</h2>
+<p>These are <b>not averages</b>. Each fire's figure puts three single days side by side, one of each kind:</p>
+<ul>
+<li>the fire's first <b>pyroCb</b> day;</li>
+<li>its biggest-growth <b>pyroCu</b> day;</li>
+<li>its biggest-growth day with <b>no deep plume cloud</b>.</li>
+</ul>
+<p>Each is drawn and chosen exactly like a single day's sounding above. A fire with no day of a kind shows only the others.
+Every pyroCb day, and more pyroCu and no-plume days, are in the browser on the <a href="soundings.html">Soundings</a> page.</p>
+</div>
+
+<div class="card"><h2>References</h2><ul>
+<li>Tory, K. J., and J. D. Kepert, 2021: Pyrocumulonimbus firepower threshold: assessing the atmospheric potential for pyroCb.
+<i>Weather and Forecasting</i>. <a href="https://doi.org/10.1175/WAF-D-20-0027.1">doi:10.1175/WAF-D-20-0027.1</a></li>
+<li>Gilmore, M. S., and L. J. Wicker, 1998: The influence of midtropospheric dryness on supercell morphology and evolution.
+<i>Monthly Weather Review</i>, 126, 943–958. <a href="https://doi.org/10.1175/1520-0493(1998)126%3C0943:TIOMDO%3E2.0.CO;2">doi:10.1175/1520-0493(1998)126&lt;0943:TIOMDO&gt;2.0.CO;2</a> (DCAPE)</li>
+<li>May, R. M., and co-authors: MetPy, a Python package for meteorological data. Unidata.
+<a href="https://doi.org/10.5065/D6WW7G29">doi:10.5065/D6WW7G29</a></li>
+</ul></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("soundings.html");
+if (location.hash) { const t = document.querySelector(location.hash); if (t) t.scrollIntoView(); }
+</script></body></html>

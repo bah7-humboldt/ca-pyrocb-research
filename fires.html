@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fire Timelines · PyroCb Research</title>
+<meta name="description" content="Day-by-day timelines of growth, fire power and pyroCb threshold for 23 large California fires, north and south, 2018-2024.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Fire by fire</h1>
+<p class="sub">Pick a fire to follow it day by day: how much it grew, how hard it burned, how much fire power the air
+demanded for a pyroCb, and what its plume actually did. Hover a day for its numbers, click it for the full detail.</p>
+<div class="chips" id="pick" style="margin-bottom:6px"></div>
+<div class="tiles" id="tiles"></div>
+<div data-guide="guide.html#fi-locator" class="card" id="loccard"><h2>Where it burned</h2><p class="note">Left: the fire among the study's other fires. Right: its
+final perimeter and each study day's hot front (the point the soundings use), coloured by what the plume did that day.</p>
+  <img id="loc" alt="" style="max-width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff" loading="lazy"></div>
+<div data-guide="guide.html#fi-growth" class="card"><h2>Growth each fire day</h2>
+  <p class="note">Bars coloured by what the plume did that day.</p><div id="lg"></div><div class="chart" id="growth"></div></div>
+<div data-guide="guide.html#fi-fpline" class="card"><h2>Fire power against the threshold</h2>
+  <p class="note">Peak-hour fire power and the day's lowest PFT, both in GW on one log axis. A pyroCb needs the orange line to
+  come close to the grey one. A × along the top marks days when the air had no PFT solution (too dry or stable for a pyroCb at any fire power).</p>
+  <div class="legend"><span><i style="width:18px;height:2px;background:var(--c-pyrocb);display:inline-block"></i>fire power (GOES)</span>
+    <span><i style="width:18px;height:2px;background:var(--ink-2);display:inline-block"></i>PFT (HRRR)</span></div>
+  <div class="chart" id="fpline"></div></div>
+<div data-guide="guide.html#fi-ratio" class="card"><h2>FP ÷ PFT</h2><p class="note">The study's best separator. The dashed line is the cut chosen on all the fires.</p>
+  <div class="chart" id="ratio"></div></div>
+<div class="grid2 wide-left">
+  <div data-guide="guide.html#fi-notable" class="card"><h2>Notable days</h2><div id="list"></div></div>
+  <div class="card detail" id="detail"></div>
+</div>
+<div data-guide="guide.html#fi-fuels" class="card" id="fuelcard"><h2>Fuel conditioning</h2><p class="note">NFDRS indices for the fire's Predictive Services
+Area (the RAWS group behind the ONCC/OSCC fire danger charts), from 75 days before the first study day: the year's
+Energy Release Component and 1000-h fuel moisture against the PSA's normal range and its 90th/97th (10th/3rd) percentiles,
+gridMET 1000-h moisture at the fire, and NFDRS live fuel moisture. Shading marks the study days, pyroCb (orange) and pyroCu (blue).</p>
+  <img id="fuelimg" alt="" style="max-width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff" loading="lazy"></div>
+<div data-guide="guide.html#fi-weather" class="card" id="wxcard"><h2>Surface weather: RAWS against ERA5</h2><p class="note" id="wxnote"></p>
+  <img id="wximg" alt="" style="max-width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff" loading="lazy"></div>
+<div data-guide="sounding-guide.html#examples" class="card" id="cmpcard"><h2>Example soundings by plume class</h2><p class="note">Three single days side by side, not
+averages: the fire's first pyroCb day, its biggest pyroCu day and its biggest day with no deep plume cloud.
+<a href="sounding-guide.html#examples">More →</a></p>
+  <img id="cmp" alt="" style="max-width:100%;border-radius:6px;border:1px solid var(--ring)" loading="lazy"></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("fires.html");
+const F = PYRO.fires, keys = Object.keys(F), cut = PYRO.scores.thresholds.find(t => t.column === "ratio_max").pooled_cut;
+let cur = new URLSearchParams(location.search).get("fire");
+if (!F[cur]) cur = keys[0];
+document.getElementById("lg").innerHTML = PC.legend();
+function pick() {
+  document.getElementById("pick").innerHTML = keys.map(k => `<span class="chip ${k === cur ? "on" : ""}" data-k="${k}">${F[k].label}</span>`).join("");
+  document.querySelectorAll("#pick .chip").forEach(c => c.addEventListener("click", () => { cur = c.dataset.k; history.replaceState(null, "", "?fire=" + cur); draw(); }));
+}
+function show(d) { PG.detail(document.getElementById("detail"), d); }
+function draw() {
+  pick();
+  const f = F[cur], ds = PYRO.days.filter(d => d.fire === cur).sort((a, b) => a.day < b.day ? -1 : 1);
+  const n = c => f.classes[c] || 0;
+  document.getElementById("tiles").innerHTML = [
+    [f.days, "fire days studied"], [f.growth_ac.toLocaleString(), "acres mapped by satellite"],
+    [n("pyroCb"), "pyroCb days"], [n("pyroCu"), "pyroCu days"], [Math.round(f.pyrocb_growth_share * 100) + "%", "of growth on pyroCb days"],
+    [f.radar_usable ? f.radar : f.radar + " (clutter)", `radar · ${f.sat}`],
+  ].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  const click = d => show(PG.byId[d.id]);
+  PC.bars(document.getElementById("growth"), { days: ds.map(d => ({ id: d.id, day: d.day, v: d.growth_ac, cls: d.cls, html: PG.dayTip(d) })),
+    label: "acres", onClick: click });
+  PC.lines(document.getElementById("fpline"), { days: ds.map(d => d.day), log: true, label: "GW",
+    series: [{ name: "PFT", vals: ds.map(d => d.pft_min_gw === "inf" ? null : d.pft_min_gw), color: "var(--ink-2)", marks: ds.map(d => d.pft_min_gw === "inf") },
+             { name: "FP", vals: ds.map(d => d.fp_max_gw), color: "var(--c-pyrocb)" }],
+    html: i => PG.dayTip(ds[i]) });
+  PC.bars(document.getElementById("ratio"), { days: ds.map(d => ({ id: d.id, day: d.day, v: d.ratio_max, cls: d.cls, html: PG.dayTip(d) })),
+    label: "FP / PFT", log: true, cut, cutLabel: `cut ${cut.toFixed(2)}`, onClick: click });
+  const notable = ds.filter(d => d.cls === "pyroCb" || d.cls === "pyroCu" || d.note);
+  document.getElementById("list").innerHTML = notable.length ? `<div class="scroll tall"><table><tr><th>Day</th><th>Class</th><th class="n">Growth</th><th class="n">FP/PFT</th></tr>` +
+    notable.map(d => `<tr data-id="${d.id}" style="cursor:pointer"><td>${d.day}</td><td><span class="badge ${d.cls}">${PC.CLS_NAME[d.cls]}</span></td><td class="n">${PC.fmt(d.growth_ac, 0)}</td><td class="n">${PC.fmt(d.ratio_max, 2)}</td></tr>`).join("") + `</table></div>` : `<p class="note">No pyroCb or pyroCu days.</p>`;
+  document.querySelectorAll("#list tr[data-id]").forEach(tr => tr.addEventListener("click", () => show(PG.byId[tr.dataset.id])));
+  show(ds.find(d => d.cls === "pyroCb") || ds.find(d => d.cls === "pyroCu") || null);
+  const ci = document.getElementById("cmp");
+  if (f.compare_img) { ci.src = f.compare_img; ci.alt = `Example skew-T soundings by plume class, ${f.label}`; document.getElementById("cmpcard").style.display = ""; }
+  else document.getElementById("cmpcard").style.display = "none";
+  for (const [kind, card] of [["fuels", "fuelcard"], ["weather", "wxcard"]]) {
+    const im = document.getElementById(kind === "fuels" ? "fuelimg" : "wximg"), src = f[kind + "_img"];
+    document.getElementById(card).style.display = src ? "" : "none";
+    if (src) { im.src = src; im.alt = `${kind === "fuels" ? "Fuel conditioning (NFDRS)" : "RAWS and ERA5 surface weather"}, ${f.label}`; }
+  }
+  const w = f.wx_stats;
+  document.getElementById("wxnote").innerHTML = w ? `Hourly weather at the nearest RAWS with data, <b>${w.raws}</b> (${w.raws_mi} mi from the
+    fire's hot fronts), against ERA5 reanalysis at that RAWS and at the fire, in local time. Over ${w.hours} hours ERA5 at the RAWS ran
+    ${w.temp_c_bias >= 0 ? "+" : ""}${w.temp_c_bias.toFixed(1)} °C, ${w.rh_pct_bias >= 0 ? "+" : ""}${w.rh_pct_bias.toFixed(0)}% RH and
+    ${w.wind_ms_bias >= 0 ? "+" : ""}${w.wind_ms_bias.toFixed(1)} m/s wind against the station (correlation ${w.temp_c_r.toFixed(2)},
+    ${w.rh_pct_r.toFixed(2)}, ${w.wind_ms_r.toFixed(2)}). ERA5's ~25 km grid smooths terrain, so ridge and valley stations differ by
+    elevation; RAWS wind is a 10-minute mean at 20 ft, ERA5 an hourly 10 m wind.` : "";
+  const li = document.getElementById("loc");
+  if (f.locator_img) { li.src = f.locator_img; li.alt = `Locator map and study-day hot fronts, ${f.label}`; document.getElementById("loccard").style.display = ""; }
+  else document.getElementById("loccard").style.display = "none";
+}
+draw();
+</script></body></html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyroCb Factors · PyroCb Research</title>
+<meta name="description" content="Each ingredient of a pyroCb day (fire power, plume height, stability, wind, moisture, fuels, terrain) shown by plume class and scored, plus a PFT calculator.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>What makes a pyroCb day?</h1>
+<p class="sub">Each factor below is shown for every fire day, split by what the fire's plume did. A factor is useful if
+pyroCb days (orange) sit apart from the rest. The score is from a leave-one-fire-out test: the cut is chosen on all the fires but
+one and tried on the one left out, for each fire in turn, so a factor that only works for one fire scores badly. The <a href="factor-guide.html">Factor guide</a>
+explains each factor in depth, with the research it comes from.</p>
+<div data-guide="guide.html#fa-rank" class="card"><h2>How the factors rank</h2>
+  <p class="note">Balanced accuracy when each fire is held out (0.5 = no better than chance, 1 = perfect). Click a bar to jump to that factor.</p>
+  <div id="rank"></div>
+</div>
+<div id="sections"></div>
+<div data-guide="guide.html#fa-calc" class="card" id="calculator"><h2>PFT calculator</h2>
+  <p>The pyroCb firepower threshold (Tory &amp; Kepert 2021) in its simple form. Set the three atmospheric ingredients and the
+  fire's power, and see where that day would sit among the <span id="ncalc">studied</span> days.</p>
+  <div class="calc">
+    <div>
+      <div class="slider"><span>Free-convection height z<sub>fc</sub> (km above ground)</span><span class="val" id="vz"></span><input type="range" id="z" min="0.5" max="7" step="0.1" value="3"></div>
+      <div class="slider"><span>Mixed-layer wind U<sub>ML</sub> (m/s)</span><span class="val" id="vu"></span><input type="range" id="u" min="1" max="20" step="0.5" value="7"></div>
+      <div class="slider"><span>Extra plume warmth Δθ<sub>fc</sub> (K)</span><span class="val" id="vt"></span><input type="range" id="t" min="0.2" max="8" step="0.1" value="2"></div>
+      <div class="slider"><span>Fire power (GW)</span><span class="val" id="vf"></span><input type="range" id="f" min="0" max="1000" value="600"></div>
+      <p class="formula" id="eq"></p>
+      <div class="tiles" style="grid-template-columns:1fr 1fr">
+        <div class="tile"><div class="v" id="opft"></div><div class="l">PFT: least fire power for a pyroCb</div></div>
+        <div class="tile"><div class="v" id="oratio"></div><div class="l">fire power ÷ PFT</div></div>
+      </div>
+      <p class="tier" id="otier"></p><p class="note" id="onote"></p>
+    </div>
+    <div><div class="chart" id="cscatter"></div>
+      <p class="note">Every studied day (fire power against its lowest PFT), with your day as the black ring. Above the dashed
+      0.25 line is where the study's pyroCb days fell.</p></div>
+  </div>
+  <p class="note">Simplified form: PFT ≈ 0.3 · z<sub>fc</sub>² · U<sub>ML</sub> · Δθ<sub>fc</sub> GW (z in km). The study used the
+  full form with air density and the entrainment-weighted mixed layer from HRRR soundings; this calculator is for intuition only.</p>
+</div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("factors.html");
+document.getElementById("ncalc").textContent = PYRO.days.length;
+const D = PYRO.days, M = PC.M, TH = Object.fromEntries(PYRO.scores.thresholds.map(t => [t.column, t]));
+const GROUPS = [
+  ["fire-vs-air", "Fire against the air", "The atmosphere sets a threshold; the fire either meets it or doesn't. Only the ratio works across all the fires, north and south.",
+    ["ratio_max", "pft_min_gw", "fp_max_gw"]],
+  ["atmosphere", "The atmosphere's ingredients", "PFT is built from plume height, wind and extra warmth, plus moisture. PCAPE, the pyroCb parcel's buoyant energy above z_fc, is the best of the atmosphere-only measures, but none matches the fire-against-air ratio.",
+    ["pcape_max_jkg", "dcape_max_jkg", "z_fc_km", "dtheta_fc", "u_ml", "q_ml_gkg", "q700_era5"]],
+  ["fuels", "Fuels and terrain", "Pre-fire LANDFIRE in two forms, kept side by side for comparison: Scott & Burgan fire behavior fuel models (fine and live fuel plus crown fuel, all assumed to burn) and FCCS fuelbeds run through FOFEM (every fuel layer, consumed according to that day's fuel moisture). Fuel sets the energy available but barely differs between pyroCb and no-plume days; turned into a fire power, the FCCS version matches the satellite. <a href=\"factor-guide.html#g-fuel-compare\">Pros and cons of each →</a> FCCS consumption: Fire behavior and First Order Fire Effects calculations provided with the command line applications developed by the Missoula Fire Sciences Laboratory, Missoula, MT.",
+    ["ahead_avail_kgm2", "ahead_canopy_load_kgm2", "ahead_slope_deg", "burned_avail_kgm2", "fp_fuel_gw", "ratio_fuel", "fofem_fp_surface_gw", "ratio_fofem_surface"]],
+  ["moisture", "Fuel moisture", "How dry the fuels were: NFDRS indices for the fire's Predictive Services Area, gridMET at the fire, and measured live fuel moisture. Every studied day was a big fire day and already dry, so moisture barely separates pyroCb days; it acts as a precondition. <a href=\"factor-guide.html#g-moisture-baseline\">The moisture baseline for a pyroCb →</a>",
+    ["erc_psa", "erc_pct", "fm1000_psa", "fm100_psa", "fm1000", "lfmc_shrub"]],
+  ["observed", "What was observed", "Not predictors: these describe the day after the fact. Radar sees the plume column directly where the beam clears the terrain. The OMPS aerosol index sees smoke lofted high, but at 50 km it can't tell a California pyroCb from a smoky day.",
+    ["radar_rooted_top_km", "omps_ai_d0", "omps_ai_d1", "growth_ac"]],
+];
+const sec = document.getElementById("sections");
+for (const [id, title, blurb, keys] of GROUPS) {
+  sec.insertAdjacentHTML("beforeend", `<h2 style="margin-top:28px" id="${id}">${title}</h2><p class="sub">${blurb}</p>` +
+    keys.map(k => `<div class="card" id="f-${k}"><h3 style="margin-top:0">${M[k].label}</h3><p class="note">${M[k].what}
+      <a href="factor-guide.html#g-${k}">In depth, with sources →</a></p>
+      <div class="grid2 wide-left"><div class="chart" id="s-${k}"></div><div class="score" id="sc-${k}"></div></div></div>`).join(""));
+}
+function sentence(k, t) {
+  const dir = t.higher_is_pyroCb ? "at or above" : "at or below";
+  return `<p>PyroCb likely ${dir} <b>${PC.fmt(t.pooled_cut, M[k].nd + (t.pooled_cut < 1 ? 2 : 0))}${M[k].unit ? " " + M[k].unit : ""}</b> (best cut, all fires).</p>
+    <div class="kv"><div class="k">All fires</div><div class="v">${t.pooled_hit} pyroCb, ${t.pooled_false_alarm} others flagged</div>
+    <div class="k">Each fire held out</div><div class="v">${t.lofo_hit} pyroCb, ${t.lofo_false_alarm} others flagged</div>
+    <div class="k">Balanced accuracy</div><div class="v"><span class="big">${PC.fmt(t.lofo_balanced_acc, 2)}</span></div></div>
+    <p class="note"><a href="explore.html?x=${k}&y=ratio_max">Plot against FP/PFT →</a></p>`;
+}
+for (const [, , , keys] of GROUPS) for (const k of keys) {
+  const t = TH[k];
+  PC.strip(document.getElementById("s-" + k), { points: D.map(d => ({ v: PC.val(d, k), cls: d.cls, html: PG.dayTip(d), id: d.id })),
+    log: M[k].log, label: `${M[k].short}${M[k].unit ? " (" + M[k].unit + ")" : ""}`, cut: t ? t.pooled_cut : null,
+    cutLabel: t ? `${t.higher_is_pyroCb ? "≥" : "≤"} ${PC.fmt(t.pooled_cut, 2)}` : "",
+    onClick: p => location.href = `explore.html?x=pft_min_gw&y=fp_max_gw&day=${p.id}` });
+  document.getElementById("sc-" + k).innerHTML = t ? sentence(k, t) : `<p class="note">Not scored.</p>`;
+}
+// ranking bars (HTML, single measure, sorted)
+const rk = PYRO.scores.thresholds.filter(t => M[t.column]).sort((a, b) => b.lofo_balanced_acc - a.lofo_balanced_acc);
+document.getElementById("rank").innerHTML = rk.map(t => `<a href="#f-${t.column}" style="display:grid;grid-template-columns:minmax(120px,240px) 1fr 44px;gap:10px;align-items:center;text-decoration:none;color:var(--ink);margin:5px 0">
+  <span style="font-size:13.5px">${M[t.column].short}</span>
+  <span style="background:var(--surface-2);border-radius:4px;height:14px;position:relative"><span style="position:absolute;inset:0 auto 0 0;width:${Math.max(0, (t.lofo_balanced_acc - 0.4) / 0.6 * 100)}%;background:${t.column === "ratio_max" || t.column === "radar_rooted_top_km" ? "var(--c-pyrocb)" : "var(--axis)"};border-radius:4px"></span></span>
+  <span class="n" style="font-variant-numeric:tabular-nums;font-size:13.5px;text-align:right">${t.lofo_balanced_acc.toFixed(2)}</span></a>`).join("") +
+  `<p class="note">Bars start at 0.4. Radar top is scored on the five fires with a usable radar only.</p>`;
+
+// calculator
+const $ = id => document.getElementById(id);
+const fpFromS = s => Math.pow(10, 0.5 + s / 1000 * 2.5);   // 3 to 1000 GW
+function calc() {
+  const z = +$("z").value, u = +$("u").value, th = +$("t").value, fp = fpFromS(+$("f").value);
+  const pft = 0.3 * z * z * u * th, r = fp / pft;
+  $("vz").textContent = z.toFixed(1) + " km"; $("vu").textContent = u.toFixed(1) + " m/s"; $("vt").textContent = th.toFixed(1) + " K";
+  $("vf").textContent = Math.round(fp) + " GW";
+  $("eq").textContent = `0.3 × ${z.toFixed(1)}² × ${u.toFixed(1)} × ${th.toFixed(1)} = ${Math.round(pft)} GW`;
+  $("opft").textContent = Math.round(pft) + " GW"; $("oratio").textContent = r.toFixed(2);
+  const cut = TH.ratio_max.pooled_cut;
+  $("otier").textContent = r >= 1 ? "Above threshold: pyroCb expected" : r >= cut ? "Within the study's pyroCb range" : r >= cut / 2 ? "Marginal" : "PyroCb unlikely";
+  $("otier").style.color = r >= cut ? "var(--c-pyrocb)" : "var(--ink-2)";
+  const near = D.filter(d => d.cls === "pyroCb" && d.ratio_max !== null).length;
+  $("onote").textContent = `In the study, all ${near} pyroCb days reached a ratio of ${cut.toFixed(2)} or more in some hour. Ratios under 1 work because satellite fire power is an hourly snapshot and PFT assumes a fully efficient plume.`;
+  const host = $("cscatter");
+  const r2 = PC.scatter(host, { points: D.map(d => ({ id: d.id, cls: d.cls, x: PC.val(d, "pft_min_gw"), y: PC.val(d, "fp_max_gw"), html: PG.dayTip(d) })),
+    xLabel: "Lowest PFT that day (GW)", yLabel: "Peak fire power (GW)", xLog: true, yLog: true, xDomain: [10, 3000], yDomain: [1, 1000],
+    diag: [{ k: 1, label: "FP = PFT" }, { k: cut, label: "FP = 0.25 × PFT", dash: "2 4" }] });
+  const svg = host.querySelector("svg"), cx = r2.x(Math.min(Math.max(pft, 10), 3000)), cy = r2.y(Math.min(Math.max(fp, 1), 1000));
+  const NS = "http://www.w3.org/2000/svg", c = document.createElementNS(NS, "circle");
+  Object.entries({ cx, cy, r: 11, fill: "none", stroke: "var(--ink)", "stroke-width": 3 }).forEach(([a, v]) => c.setAttribute(a, v));
+  svg.appendChild(c);
+}
+["z", "u", "t", "f"].forEach(id => $(id).addEventListener("input", calc));
+calc();
+</script></body></html>

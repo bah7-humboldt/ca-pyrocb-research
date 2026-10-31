@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firefighter Safety · PyroCb Research</title>
+<meta name="description" content="Every indicator in the study that bears on crew safety under a pyroconvective plume: fuels, the pyroCb forecast, downdraft energy and the radar signatures of outflow, convergence, rotation and downburst precursors.">
+<link rel="stylesheet" href="site.css">
+<style>
+.chain { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; margin: 12px 0; }
+.chain .step { flex: 1 1 150px; background: var(--surface-2); border: 1px solid var(--ring); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.chain .step b { display: block; margin-bottom: 4px; }
+.chain .step .k { color: var(--ink-2); font-size: 13px; }
+.chain .arr { align-self: center; color: var(--muted); font-size: 20px; }
+@media (max-width: 860px) { .chain .arr { display: none; } }
+.hm text { font-size: 13px; fill: var(--ink); }
+.hm .rl { font-size: 13px; fill: var(--ink); }
+.hm .cl { font-size: 12px; fill: var(--ink-2); font-weight: 600; }
+.hm .sub { font-size: 11px; fill: var(--muted); }
+.hm rect.cell { stroke: var(--surface); stroke-width: 2; }
+.hm rect.sig { fill: none; stroke: var(--ink); stroke-width: 2; }
+.hbar text { font-size: 13px; fill: var(--ink); }
+.hbar .lab { fill: var(--ink-2); }
+.ramp { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); margin-top: 6px; flex-wrap: wrap; }
+.ramp i { display: inline-block; width: 22px; height: 12px; }
+.cap { font-size: 14px; color: var(--ink-2); margin: 4px 0 0; }
+.cap b { color: var(--ink); }
+</style></head><body><div class="wrap">
+<h1>Firefighter safety under a pyroconvective plume</h1>
+<p class="sub">A pyroCb is a thunderstorm the fire builds. Its hazards to crews come from what happens after the plume turns
+convective: downdrafts and outflow that hit the ground and push fire in any direction, inflow that pulls fire toward the
+column, rotation, and a collapsing column. This page brings together every indicator in the study that bears on those
+hazards, from the fuel and weather that set the stage days ahead to the radar signatures that show them developing.</p>
+
+<div class="tiles" id="tiles"></div>
+
+<div data-guide="guide.html#sf-chain" class="card"><h2>The hazard chain</h2>
+<p>Each link needs the one before it. The forecast questions change along the chain, and so do the indicators.</p>
+<div class="chain">
+<div class="step"><b>1. Dry fuel</b><span class="k">Heavy fuels dry enough to burn completely and release heat fast. <i>PSA 1000-h, ERC.</i></span></div><span class="arr">→</span>
+<div class="step"><b>2. Plume can convect</b><span class="k">The fire's heat beats what the air needs. <i>Fire power ÷ PFT, PCAPE.</i></span></div><span class="arr">→</span>
+<div class="step"><b>3. Precipitation core</b><span class="k">Rain and ice form in the column. <i>Every pyroCb here had one.</i></span></div><span class="arr">→</span>
+<div class="step"><b>4. Downdraft</b><span class="k">Evaporation cools and drives air down. <i>DCAPE sets how hard it can fall.</i></span></div><span class="arr">→</span>
+<div class="step"><b>5. Ground hazard</b><span class="k">Outflow, erratic winds, inflow, rotation. <i>Radar: divergence, convergence, V<sub>rot</sub>.</i></span></div>
+</div>
+<p class="note">Links 1–2 are the pyroCb forecast (<a href="factors.html">Factors</a>, <a href="forecast.html">Forecasting</a>); links 3–5 are what this page adds.
+The plume can also hurt crews without becoming a pyroCb: an ash-laden column collapsing as the fire's heat drops, or the
+inflow drawing fire uphill toward it (Rothermel 1991).</p>
+</div>
+
+<h2 style="margin-top:28px">Before the shift: will there be a pyroCb?</h2>
+<div data-guide="factor-guide.html#g-moisture-baseline" class="card"><h2>Fuels: the moisture baseline</h2>
+<p>Every pyroCb day in the study fell inside these limits. They are preconditions: most days inside them did not produce a
+pyroCb, but none outside them did. Percentiles are on each PSA's full-year record, the same basis as the ONCC/OSCC fire danger
+charts. More in the <a href="factor-guide.html#baseline">Factor guide</a>.</p>
+<div class="scroll"><table id="mb"></table></div>
+</div>
+
+<div data-guide="guide.html#sf-triggers" class="card"><h2>Atmosphere and fire: the pyroCb triggers</h2>
+<div class="grid2">
+<div><h3>Fire power ÷ PFT, by plume class</h3><div class="chart" id="s-ratio"></div>
+<p class="cap" id="c-ratio"></p></div>
+<div><h3>Pyroconvective CAPE, by plume class</h3><div class="chart" id="s-pcape"></div>
+<p class="cap" id="c-pcape"></p></div>
+</div>
+<div id="lg1"></div>
+<p class="note">The morning forecast versions are on <a href="forecast.html">Forecasting</a>: a Watch when the 05 PDT HRRR puts PFT at or below
+about 360 GW, and a Warning when yesterday's peak fire power reaches a set fraction of it (0.13 in the Initial Attack report's pyroCb line).</p>
+</div>
+
+<div data-guide="guide.html#sf-triggers" class="card"><h2>Downdraft energy: DCAPE by plume class</h2>
+<div class="chart" id="s-dcape"></div>
+<p class="cap" id="c-dcape"></p>
+<p>Downdraft CAPE is the energy a parcel of dry mid-level air gains sinking to the ground once rain or ice evaporates into it.
+It runs higher on pyroCb days, but it is a weak pyroCb test: dry, deep afternoon air is common on fire days. Its value is for
+<b>the next question</b>: once a plume is convecting, how strong will its downdrafts be?</p>
+</div>
+
+<h2 style="margin-top:28px" id="signatures">What goes with stronger hazard signatures</h2>
+<p class="sub">On the pyroCb and pyroCu days, the radar measured four hazard signatures over the fire, and on the days with a radar
+within 100 km, the precipitation core. Each was ranked against the forecast factors to see which one, known before the
+shift, goes with a stronger hazard.</p>
+
+<div data-guide="guide.html#sf-heatmap" class="card"><h2>Which factor tracks which hazard</h2>
+<p>Spearman rank correlation of each radar signature with each factor on pyroCb and pyroCu days. Blue = a stronger signature
+with a higher factor value; red = a stronger signature with a lower value. A box marks p &lt; 0.05. Hover a cell for the
+sample size and p-value.</p>
+<div class="scroll"><div class="chart" id="hm" style="min-width:640px"></div></div>
+<div class="ramp" id="hm-ramp"></div>
+<p class="note">Low-level outflow, outflow area and the core signatures use only days with a radar within 100 km of the fire;
+mid-level convergence and rotation are measurable from farther out, so they use every range. For core Z<sub>DR</sub>, lower is
+the stronger signature, so its colours are flipped to match.</p>
+</div>
+
+<div data-guide="guide.html#sf-outflow" class="card"><h2>DCAPE and the outflow at the ground</h2>
+<div class="chart" id="sc-div"></div>
+<div id="lg2"></div>
+<p class="cap" id="c-div"></p>
+<div class="grid2" style="margin-top:14px">
+<div><h3>Share of days with downburst-strength outflow</h3><div class="chart" id="hit"></div>
+<p class="cap">Outflow at or above Gibson &amp; Carlin's (2025) 0.0025 s<sup>−1</sup> divergence threshold, radar within 100 km.</p></div>
+<div><h3>Median outflow by DCAPE band</h3><div class="chart" id="med"></div>
+<p class="cap">The same days, split at the day's peak DCAPE. The split is the best one on 25 days; of the 3 days
+below 800 J/kg, 2 still reached the threshold (North Complex, 8–9 Sep 2020, during the offshore wind event, where the
+strong ambient wind may account for it). Treat low DCAPE as less likely, not safe.</p></div>
+</div>
+</div>
+
+<div data-guide="guide.html#sf-convrot" class="card"><h2>DCAPE, inflow and rotation</h2>
+<div class="grid2">
+<div><h3>Mid-level convergence</h3><div class="chart" id="sc-conv"></div><p class="cap" id="c-conv"></p></div>
+<div><h3>Rotation (V<sub>rot</sub>)</h3><div class="chart" id="sc-vrot"></div><p class="cap" id="c-vrot"></p></div>
+</div>
+<p>Mid-level convergence is air flowing into the storm 3–7 km up. Gibson &amp; Carlin (2025) found it the most consistent
+downburst precursor: it feeds dry air into the core, where evaporation chills it. V<sub>rot</sub> is half the velocity
+difference across the strongest couplet over the fire. All three ground-relevant signatures rise with DCAPE; nothing else
+in the forecast set does.</p>
+</div>
+
+<div data-guide="guide.html#sf-core" class="card"><h2>The precipitation core doubles the outflow</h2>
+<div class="grid2">
+<div><h3>Low-level outflow</h3><div class="chart" id="cc-div"></div></div>
+<div><h3>Mid-level convergence</h3><div class="chart" id="cc-conv"></div></div>
+</div>
+<p class="cap" id="c-core"></p>
+<p>A core is at least 10 precipitation gates (30 dBZ or more, ρ<sub>hv</sub> ≥ 0.90) in a height bin over the fire. All six
+pyroCb days within 100 km of a radar had one; on the pyroCu days without one, there was nothing for a downdraft to load
+from. Once a pyroCb is likely, assume a core and plan for its outflow.</p>
+</div>
+
+<div data-guide="guide.html#sf-pcape" class="card"><h2>PCAPE and z<sub>fc</sub> set the core, not the outflow</h2>
+<div class="grid2">
+<div><h3>Strongest core against PCAPE</h3><div class="chart" id="sc-zp"></div><p class="cap" id="c-zp"></p></div>
+<div><h3>Strongest core against z<sub>fc</sub></h3><div class="chart" id="sc-zz"></div><p class="cap" id="c-zz"></p></div>
+<div><h3>Outflow against PCAPE</h3><div class="chart" id="sc-dp"></div><p class="cap" id="c-dp"></p></div>
+<div><h3>Outflow against z<sub>fc</sub></h3><div class="chart" id="sc-dz"></div><p class="cap" id="c-dz"></p></div>
+</div>
+<p>More pyroconvective energy and a lower free-convection height go with heavier cores: higher reflectivity and descending
+K<sub>DP</sub> cores, the water and ice loading that drives a downburst. They do not go with the outflow measured at the ground,
+which is DCAPE's: how dry the air under the core is decides how much of that load turns into a downdraft.</p>
+</div>
+
+<div data-guide="guide.html#sf-explore" class="card"><h2>Explore any pair</h2>
+<div class="controls"><label>Signature <select id="ex-s"></select></label><label>Factor <select id="ex-f"></select></label></div>
+<div class="chart" id="sc-ex"></div>
+<p class="cap" id="c-ex"></p>
+</div>
+
+<h2 style="margin-top:28px" id="precursors">During the shift: downburst precursors on radar</h2>
+<div data-guide="guide.html#sf-precursors" class="card"><h2>How often each precursor appeared</h2>
+<p>Gibson &amp; Carlin's (2025) polarimetric precursors, searched in every scan for 90 minutes either side of the day's tallest
+plume, on days with a radar within 100 km.</p>
+<div class="chart" id="pc"></div>
+<div id="lg3"></div>
+<p class="cap">The descending K<sub>DP</sub> core (heavy rain and melting ice sinking through the freezing level) is the one that
+separates pyroCb days. Z<sub>DR</sub> troughs and ρ<sub>hv</sub> drops are nearly universal in these high-based cores and don't
+help (<a href="radar.html#zdr-rho">what they are and how they're calculated</a>). Method and thresholds: <a href="radar.html#hazards">Radar: firefighter hazards</a>; why the 95th percentile:
+<a href="radar.html#percentiles">percentile choices</a>.</p>
+</div>
+
+<div data-guide="#read-th" class="card"><h2>The core through the afternoon</h2>
+<p>Time–height pictures of the precipitation core over the fire on every day that had one. Look for the 95th-percentile
+reflectivity and K<sub>DP</sub> columns reaching down from above the 0 °C line (dashed) toward the ground: that is the core
+descending, the step before the downburst. <a href="radar.html#percentiles">Why the 95th percentile? →</a> ·
+<a href="radar.html#zdr-rho">Z<sub>DR</sub> trough and ρ<sub>hv</sub> drop explained →</a> ·
+<a href="#read-th">How to read these pictures →</a></p>
+<div id="browser"></div>
+</div>
+
+<div class="card" id="read-th"><h2>How to read the time–height pictures</h2>
+<p>Each picture compresses three hours of radar scans over the fire into four panels. Read them left to right as one story:
+<b>how heavy the core is</b> (reflectivity), <b>how much liquid water it holds</b> (K<sub>DP</sub>), and <b>what the particles are</b>
+(Z<sub>DR</sub> and ρ<sub>hv</sub>), and in all four, <b>whether that core is coming down</b>.</p>
+<img src="img/radar/polar_dixie_2021-07-19.png" alt="Time-height radar picture, Dixie Fire 19 July 2021, used as the worked example" loading="lazy"
+  style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff;cursor:zoom-in" onclick="PG.lightbox()(this.src, this.alt)">
+<p class="cap">Worked example: Dixie Fire, 19 July 2021 (pyroCb), KBBX radar. Click to enlarge.</p>
+
+<h3>The frame common to all four panels</h3>
+<div class="scroll"><table>
+<tr><th>Element</th><th>What it is</th></tr>
+<tr><td><b>Horizontal axis</b></td><td>Time (PDT), 90 minutes either side of the scan with the day's tallest fire-rooted plume. Each thin
+  column of cells is one radar volume scan, about 4–5 minutes apart (46 scans on the example day, 14:59–17:56).</td></tr>
+<tr><td><b>Vertical axis</b></td><td>Height above the ground at the fire, in Gibson &amp; Carlin's (2025) bins: 0.5 km deep up to 3 km,
+  1 km deep to 8 km, 2 km deep above. Taller cells higher up reflect the coarser bins, not deeper echo.</td></tr>
+<tr><td><b>A coloured cell</b></td><td>One number summarising every precipitation gate in that height bin, within 15 km of the fire,
+  in that scan: Z ≥ 30 dBZ, ρ<sub>hv</sub> ≥ 0.90, Z<sub>DR</sub> −2 to 8 dB. Plume debris is screened out first.</td></tr>
+<tr><td><b>A blank cell</b></td><td>Fewer than 10 precipitation gates there. It does <i>not</i> mean no echo: smoke and debris, light
+  precipitation and clear air all leave the cell blank.</td></tr>
+<tr><td><b>Dashed line, "0 C"</b></td><td>The HRRR freezing level above the fire, the day's median (3.0 km on the example day). Above it,
+  precipitation is ice; below it, ice melts. Most of the precursors are about what crosses this line.</td></tr>
+<tr><td><b>Colour bars</b></td><td>Stepped, not continuous: each shade is a band. In three panels darker = more of the quantity.
+  In the ρ<sub>hv</sub> panel the scale is reversed, so <b>darker = lower ρ<sub>hv</sub></b>: darker always means "more signal".</td></tr>
+<tr><td><b>Title line</b></td><td>The precursors the automatic search flagged that day. Treat it as a pointer to look, not a
+  verdict: the flags are looser than a forecaster's eye (see each panel below).</td></tr>
+</table></div>
+
+<h3>Panel 1: 95th-percentile reflectivity (95Z)</h3>
+<p><b>What it shows:</b> how intense the core is in each layer: the value only the top 5% of precipitation gates exceed
+(<a href="radar.html#percentiles">why the 95th</a>). Reflectivity grows with the size and number of particles, so hail, graupel and big
+raindrops light it up.</p>
+<p><b>Look for:</b> a column of dark cells (45 dBZ and up) building aloft, then the darkest cells stepping down through the 0 °C line
+toward the ground over successive scans. That is a <b>descending reflectivity core</b> (DRC): the load of water and ice falling out,
+dragging air down with it. The automatic flag needs 50 dBZ or more, and the highest such bin dropping at least one bin between
+consecutive scans.</p>
+<p><b>In the example:</b> the core reaches about 8 km near 15:40–15:50 and holds 40–50 dBZ below the freezing level from about
+15:30 to 16:20. Its strongest cell (57 dBZ) is in the lowest bin at 15:40. It never builds a 50 dBZ core aloft that then descends,
+so no DRC is flagged. California pyroCb cores are usually too light for the 50 dBZ test (only 5 study days reached it). Panel 2
+is the better guide here.</p>
+
+<h3>Panel 2: 95th-percentile K<sub>DP</sub> (95K<sub>DP</sub>)</h3>
+<p><b>What it shows:</b> specific differential phase, the rate (°/km) at which the horizontal pulse falls behind the vertical one passing
+through the echo. Flattened raindrops and wet, melting ice slow the horizontal pulse, so K<sub>DP</sub> rises with the <i>liquid water
+content</i>. Dry ice, small drops and debris barely register, and unlike reflectivity it isn't fooled by a few large hailstones. A high
+K<sub>DP</sub> means a heavy rain-and-meltwater load: the fuel for a downdraft.</p>
+<p><b>Look for:</b> dark cells (1 °/km and up) that first appear near or just above the freezing level and then reach lower bins in the
+following scans: the <b>descending K<sub>DP</sub> core</b>. Gibson &amp; Carlin found it in 85% of the U.S. downbursts they studied,
+and it was this study's best precursor: on 4 of 6 pyroCb days against 1 of 10 pyroCu days with a core.</p>
+<p><b>In the example:</b> the clearest descent in the study. K<sub>DP</sub> passes 1 °/km at 5–6 km at 15:56, at 4–5 km at 16:00, then from
+1 km up to 5 km at 16:04, and down to 0.5 km by 16:08. That is about 12 minutes from first sign aloft to the lowest bin. A second,
+weaker pulse follows near 16:15–16:19, and short bursts at 2.5–4 km follow after 17:00.</p>
+<p class="note">Caution: K<sub>DP</sub> here is a 4 km fit to the differential phase, so isolated very dark cells (8–10 °/km; 10 is the
+cap) can be noise from a phase jump. Trust a pattern that persists over several scans and stacked bins more than a single cell.</p>
+
+<h3>Panel 3: core Z<sub>DR</sub> (median in the reflectivity core)</h3>
+<p><b>What it shows:</b> the typical shape of the particles in the core, which is the gates at or above that bin's 95Z. Big raindrops
+are flattened and give positive Z<sub>DR</sub> (+1 to +4 dB, darker). Hail and graupel tumble and are near-spherical, and dry ice returns
+weakly, so they give values near 0 dB (lighter).</p>
+<p><b>The normal profile:</b> light above the 0 °C line (ice) and darker below it (melted to rain). <b>Look for</b> the
+<b>Z<sub>DR</sub> trough</b>: light cells (below 1 dB) persisting <i>under</i> the dashed line, where the core should already be rain.
+That is ice falling fast enough to cross the freezing level before it melts, which is what a strong downdraft does
+(<a href="radar.html#zdr-rho">full explanation</a>).</p>
+<p><b>In the example:</b> the profile is mostly normal. The median core Z<sub>DR</sub> is about 0 dB at 3–7 km and rises to about 2–3 dB in
+the lowest kilometre. Light cells do sit just below the line at 2–3 km around 15:40–16:20 (medians about 1.2 dB), and that is
+enough to trip the automatic flag. Scattered very dark cells (5–7 dB) above the freezing level aren't ice. They are most likely ash
+or debris that passed the precipitation screen, and with only a handful of core gates per bin (bins here held about 15–45
+precipitation gates, so the core is 1–3 gates), single cells are noisy.</p>
+
+<h3>Panel 4: core ρ<sub>hv</sub> (10th percentile in the reflectivity core)</h3>
+<p><b>What it shows:</b> how uniform the core's particles are. Pure rain or pure snow gives values near 1 (light). A mix of shapes,
+sizes and phases, especially melting hail, lowers it (darker). The 10th percentile looks at the low tail, where that signature lives.</p>
+<p><b>Look for:</b> dark cells (below 0.96) <b>in the same place as the Z<sub>DR</sub> trough</b>, just under the freezing level. Together
+they mean melting ice coming down: the <b>ρ<sub>hv</sub> drop</b>. Dark cells far above the freezing level mean something else, usually
+debris mixed into the cloud. Gates below 0.90 were removed as possible debris, so this panel can only range from 0.90 to 1.</p>
+<p><b>In the example:</b> the darkest cells are at 3–6 km near 15:40–16:00, above the freezing level, where they most likely mark plume
+debris mixed into the rising column rather than melting hail. Dark cells under the line around 15:45–16:20 coincide with the light
+Z<sub>DR</sub> cells there and the K<sub>DP</sub> descent, which is the collocated signature.</p>
+
+<h3>Putting the four together</h3>
+<ol>
+<li><b>Find the core</b> in panel 1: when and how high it builds.</li>
+<li><b>Check panel 2 for a load coming down:</b> K<sub>DP</sub> appearing at or above the freezing level, then lower bins in the next
+scans. This is the strongest single cue in these fires.</li>
+<li><b>Confirm with panels 3 and 4</b> in the same minutes, just under the dashed line: light Z<sub>DR</sub> plus dark ρ<sub>hv</sub>
+(melting ice in the downdraft). On their own these are weak here; they appear on almost every core day.</li>
+<li><b>Expect the outflow next.</b> In Gibson &amp; Carlin's cases the collocated Z<sub>DR</sub>/ρ<sub>hv</sub> signature typically came about
+10 minutes before damaging winds reached the surface. A descending K<sub>DP</sub> core at the ground is the time crews near the column are
+most exposed to sudden wind shifts. Compare the day's <a href="radar.html#kinematics">outflow measures</a> and its DCAPE in the
+caption above each picture.</li>
+</ol>
+<p class="note"><b>Limits of these pictures.</b> They summarise a 15 km circle around the fire, not a tracked storm, so a cell drifting out
+of the circle disappears and one drifting in appears. Far from the radar the lowest bins may be empty because the beam is above
+them. The pictures show conditions over the fire, not at a particular crew's location. They are research hindsight from archived
+data; live NEXRAD shows the same fields as height slices, not in this format.</p>
+</div>
+
+<div data-guide="sounding-guide.html#single" class="card"><h2>DCAPE on a sounding</h2>
+<div class="grid2 wide-left">
+<div id="snd"></div>
+<div><p>Every sounding on the <a href="soundings.html">Soundings</a> page now carries the DCAPE downdraft path: a parcel from the
+driest (lowest θ<sub>e</sub>) air in the lowest 400 hPa, carried down moist-adiabatically to the ground. The area between it
+and the warmer environment is DCAPE. A deep, dry, well-mixed layer under a high cloud base, the usual fire-day sounding,
+gives large values.</p>
+<p>DCAPE assumes the downdraft stays saturated all the way down. A dry, high-based pyroCb may evaporate its rain too early or
+too little, so read it as the upper end of what the air allows.</p>
+<p><a href="sounding-guide.html">How to read the soundings →</a></p></div>
+</div>
+</div>
+
+<h2 data-guide="guide.html#sf-brief" style="margin-top:28px">For the morning brief</h2>
+<div class="card"><div class="scroll"><table id="brief"></table></div>
+<p class="note">Thresholds from this study's 23 California fires; most are a best cut on a small sample, not a validated warning
+criterion. Use them to raise awareness and to watch the radar, not as a go/no-go.</p></div>
+
+<div class="card"><h2>Limits</h2>
+<ul>
+<li><b>Small sample.</b> 25 days within 100 km of a radar (6 pyroCb), 59–63 days for the longer-range signatures. Many tests were run;
+about one correlation in twenty could reach p 0.05 by chance. DCAPE's three agreeing correlations are a strong lead, not a validated rule.</li>
+<li><b>The radar sees the column, not the ground.</b> At 50–100 km the lowest beam is hundreds of metres to over a kilometre up, so
+shallow outflows and small vortices are missed or weakened.</li>
+<li><b>No storm tracking.</b> The search covers 15 km around the fire; outflow from a cell that drifted away is not counted.</li>
+<li><b>Day maxima.</b> DCAPE, PCAPE and the radar signatures are each the day's peak, not matched hour by hour.</li>
+<li><b>K<sub>DP</sub> is approximate</b> (a 4 km fit to the differential phase), and DCAPE assumes a saturated downdraft.</li>
+</ul></div>
+
+<div class="card"><h2>References</h2><ul class="reflist">
+<li>Gibson, M. N., and J. T. Carlin, 2025: polarimetric radar downburst precursors, automated storm tracking. Full citations on <a href="radar.html#hazards">Radar</a>.</li>
+<li>Carlin, J. T., and A. V. Ryzhkov, 2025: polarimetric signatures of developing downbursts. Full citation on <a href="radar.html#hazards">Radar</a>.</li>
+<li>Rothermel, R. C., 1991: <i>Predicting behavior and size of crown fires in the northern Rocky Mountains.</i> USDA Forest Service Res. Pap. INT-438.</li>
+<li>Tory, K. J., and J. D. Kepert, 2021: Pyrocumulonimbus firepower threshold: assessing the atmospheric potential for pyroCb.
+<i>Weather and Forecasting</i>, 36, 439–456. <a href="https://doi.org/10.1175/WAF-D-20-0027.1">doi:10.1175/WAF-D-20-0027.1</a></li>
+<li>Every factor's sources: <a href="factor-guide.html#refs">Factor guide references</a>.</li>
+</ul></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("safety.html");
+const H = PYRO.scores.hazards, D = PYRO.days, M = PC.M;
+const yes = v => v === true || v === "True" || v === 1;
+const DIV = 0.0025, DC = 1235;
+const TH = Object.fromEntries(PYRO.scores.thresholds.map(t => [t.column, t]));
+const HD = (H ? H.days : []).filter(d => d.final_class === "pyroCb" || d.final_class === "pyroCu")
+  .map(d => ({ ...d, cls: d.final_class, id: `${d.fire}_${d.fire_day}`, day: d.fire_day }));
+const NEAR = HD.filter(d => yes(d.near));
+const SIG = Object.fromEntries((H ? H.signatures : []).map(s => [s.col, s]));
+const FAC = Object.fromEntries((H ? H.factors : []).map(f => [f.col, f]));
+const UNIT = { dcape_max_jkg: "J/kg", pcape_max_jkg: "J/kg", z_fc_km: "km", ratio_max: "", q_ml_gkg: "g/kg" };
+const med = a => { const v = a.filter(x => x !== null && isFinite(x)).sort((p, q) => p - q); if (!v.length) return null;
+  const i = v.length / 2; return v.length % 2 ? v[Math.floor(i)] : (v[i - 1] + v[i]) / 2; };
+const sci = v => v === null || v === undefined ? "–" : (v * 1000).toFixed(1) + " × 10⁻³";  // divergence and convergence
+const corr = (s, f) => (H ? H.corr : []).find(c => c.signature === s && c.factor === f);
+const pTxt = p => p < 0.001 ? "< 0.001" : p.toFixed(p < 0.01 ? 3 : 2);
+const rtxt = (s, f) => { const c = corr(s, f); return c ? `ρ ${c.rho > 0 ? "+" : "−"}${Math.abs(c.rho).toFixed(2)}, n ${c.n}, p ${pTxt(c.p)}` : "too few days"; };
+function hazTip(d) {
+  return `<b>${PG.fireLabel(d.fire)}</b> · ${d.day}<br><span class="badge ${d.cls}">${PC.CLS_NAME[d.cls]}</span> · radar ${PC.fmt(d.range_km, 0)} km<br>` +
+    `DCAPE ${PC.fmt(d.dcape_max_jkg, 0)} J/kg · PCAPE ${PC.fmt(d.pcape_max_jkg, 0)} J/kg · z<sub>fc</sub> ${PC.fmt(d.z_fc_km, 1)} km<br>` +
+    `outflow ${sci(d.div_low_s)} s⁻¹ · convergence ${sci(d.conv_mid_s)} s⁻¹ · V<sub>rot</sub> ${PC.fmt(d.vrot, 1)} m/s` +
+    (yes(d.near) ? `<br>core: ${d.z95_max !== null ? PC.fmt(d.z95_max, 0) + " dBZ" : "none"}` : "");
+}
+const pts = (rows, xk, yk) => rows.map(d => ({ id: d.id, cls: d.cls, x: d[xk], y: d[yk], html: hazTip(d) }));
+const goDay = p => location.href = `explore.html?x=dcape_max_jkg&y=pcape_max_jkg&day=${p.id}`;
+
+// ---------- headline tiles
+(() => {
+  const cb = NEAR.filter(d => d.cls === "pyroCb"), wc = cb.filter(d => d.z95_max !== null);
+  const o = NEAR.filter(d => d.div_low_s !== null && d.dcape_max_jkg !== null);
+  const hi = o.filter(d => d.dcape_max_jkg >= DC), lo = o.filter(d => d.dcape_max_jkg < DC);
+  const kdp = cb.filter(d => yes(d.kdp_core_desc)).length;
+  const c = corr("div_low_s", "dcape_max_jkg");
+  document.getElementById("tiles").innerHTML = [
+    [`${wc.length} of ${cb.length}`, "pyroCb days near a radar with a precipitation core: the load for a downdraft"],
+    [`${hi.filter(d => d.div_low_s >= DIV).length} of ${hi.length}`, `days with DCAPE ≥ ${DC.toLocaleString()} J/kg that reached downburst-strength outflow (${lo.filter(d => d.div_low_s >= DIV).length} of ${lo.length} below)`],
+    [c ? (c.rho > 0 ? "+" : "") + c.rho.toFixed(2) : "–", "rank correlation of DCAPE with outflow; PCAPE and z_fc show none"],
+    [`${kdp} of ${cb.length}`, "pyroCb days with a descending K_DP core, a downburst precursor"],
+  ].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+})();
+
+// ---------- moisture baseline (pyrocb_moisture_baseline.py)
+(() => {
+  const MB = PYRO.scores.moisture_baseline || [];
+  document.getElementById("mb").innerHTML = `<tr><th>Measure</th><th class="n">PyroCb days need</th><th class="n">PyroCb range</th><th class="n">PyroCu days inside</th><th class="n">No-plume days inside</th></tr>` +
+    MB.map(r => `<tr><td>${r.label}</td><td class="n"><b>${r.drier_when === "low" ? "≤" : "≥"} ${PC.fmt(r.envelope_edge, 1)}${r.unit ? " " + r.unit : ""}</b></td>` +
+      `<td class="n">${PC.fmt(r.pyroCb_min, 1)}–${PC.fmt(r.pyroCb_max, 1)}</td><td class="n">${r.pyroCu_inside}</td><td class="n">${r.none_inside}</td></tr>`).join("");
+})();
+
+// ---------- class strips from the main study
+function stripK(id, k, cap) {
+  const t = TH[k];
+  PC.strip(document.getElementById(id), { points: D.map(d => ({ v: PC.val(d, k), cls: d.cls, html: PG.dayTip(d), id: d.id })),
+    log: M[k].log, label: M[k].label, cut: t ? t.pooled_cut : null,
+    cutLabel: t ? `${t.higher_is_pyroCb ? "≥" : "≤"} ${PC.fmt(t.pooled_cut, k === "ratio_max" ? 2 : 0)}` : "",
+    onClick: p => location.href = `explore.html?x=${k}&y=ratio_max&day=${p.id}` });
+  if (t) document.getElementById(cap).innerHTML = `${cap === "c-dcape" ? "As a pyroCb test" : "Best cut"}: <b>${t.higher_is_pyroCb ? "≥" : "≤"} ${PC.fmt(t.pooled_cut, k === "ratio_max" ? 2 : 0)}${M[k].unit ? " " + M[k].unit : ""}</b> catches ${t.pooled_hit} pyroCb days, ${t.pooled_false_alarm} other days flagged; held-out balanced accuracy ${PC.fmt(t.lofo_balanced_acc, 2)}.`;
+}
+stripK("s-ratio", "ratio_max", "c-ratio");
+stripK("s-pcape", "pcape_max_jkg", "c-pcape");
+stripK("s-dcape", "dcape_max_jkg", "c-dcape");
+["lg1", "lg2", "lg3"].forEach(i => document.getElementById(i).innerHTML = PC.legend());
+
+// ---------- correlation heatmap (diverging blue <-> red, grey midpoint)
+const NS = "http://www.w3.org/2000/svg";
+const mk = (tag, a, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const BLUE = ["#cde2fb", "#86b6ef", "#3987e5", "#256abf", "#104281"], RED = ["#fbd5d4", "#f09a99", "#e66767", "#c93b3a", "#8f2423"];
+const darkMode = () => document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+const divColor = r => { if (r === null) return "transparent"; const a = Math.min(Math.floor(Math.abs(r) / 0.15), 4);
+  return Math.abs(r) < 0.1 ? (darkMode() ? "#383835" : "#f0efec") : (r > 0 ? BLUE : RED)[a]; };
+const inkOn = r => r !== null && Math.abs(r) >= 0.45 ? "#ffffff" : null;
+function heatmap() {
+  const host = document.getElementById("hm"); host.querySelectorAll("svg").forEach(s => s.remove());
+  if (!H) return;
+  const S = H.signatures, F = H.factors, L = 290, cw = 86, ch = 44, top = 46;
+  const W = L + cw * F.length + 8, Hh = top + ch * S.length + 6;
+  const svg = mk("svg", { viewBox: `0 0 ${W} ${Hh}`, class: "hm", role: "img", "aria-label": "Correlation of radar hazard signatures with forecast factors" });
+  host.prepend(svg);
+  F.forEach((f, j) => { const t = mk("text", { x: L + cw * (j + .5), y: top - 22, "text-anchor": "middle", class: "cl" }, svg);
+    t.textContent = { dcape_max_jkg: "DCAPE", pcape_max_jkg: "PCAPE", z_fc_km: "z_fc", ratio_max: "FP ÷ PFT", q_ml_gkg: "q_ML" }[f.col] || f.label;
+    mk("text", { x: L + cw * (j + .5), y: top - 8, "text-anchor": "middle", class: "sub" }, svg).textContent = UNIT[f.col] || "ratio"; });
+  const T = (() => { let t = host.querySelector(".tip"); if (!t) { t = document.createElement("div"); t.className = "tip"; host.appendChild(t); } return t; })();
+  S.forEach((s, i) => {
+    const flip = s.col === "zdr50_min_below_fl" ? -1 : 1, y = top + ch * i;
+    mk("text", { x: 0, y: y + ch / 2 - 2, class: "rl" }, svg).textContent = s.label.replace(/ \(.*\)$/, "");
+    mk("text", { x: 0, y: y + ch / 2 + 13, class: "sub" }, svg).textContent = s.scope === "near" ? "radar ≤ 100 km" : "all ranges";
+    F.forEach((f, j) => {
+      const c = corr(s.col, f.col), r = c ? c.rho * flip : null, x = L + cw * j;
+      mk("rect", { x, y, width: cw, height: ch, class: "cell", fill: c ? divColor(r) : "transparent" }, svg);
+      if (c && c.p < 0.05) mk("rect", { x: x + 3, y: y + 3, width: cw - 6, height: ch - 6, rx: 3, class: "sig" }, svg);
+      const t = mk("text", { x: x + cw / 2, y: y + ch / 2 + 5, "text-anchor": "middle", "font-weight": c && c.p < 0.05 ? 700 : 400 }, svg);
+      t.textContent = c ? (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(2) : "–";
+      if (inkOn(r)) t.style.fill = inkOn(r);
+      const hit = mk("rect", { x, y, width: cw, height: ch, fill: "transparent" }, svg);
+      hit.addEventListener("mousemove", ev => { T.innerHTML = `<b>${s.label}</b><br>against ${f.label}<br>` + (c ? `ρ ${c.rho > 0 ? "+" : ""}${c.rho.toFixed(2)}${flip < 0 ? " (lower Z<sub>DR</sub> = stronger, shown flipped)" : ""}<br>n ${c.n} days · p ${c.p < 0.001 ? "< 0.001" : c.p.toFixed(3)}` : "too few days");
+        T.style.display = "block"; const rr = host.getBoundingClientRect(); let xx = ev.clientX - rr.left + 14; if (xx + 290 > rr.width) xx = ev.clientX - rr.left - 290;
+        T.style.left = Math.max(0, xx) + "px"; T.style.top = (ev.clientY - rr.top + 14) + "px"; });
+      hit.addEventListener("mouseleave", () => T.style.display = "none");
+      hit.addEventListener("click", () => { document.getElementById("ex-s").value = s.col; document.getElementById("ex-f").value = f.col; explore();
+        document.getElementById("sc-ex").scrollIntoView({ behavior: "smooth", block: "center" }); });
+    });
+  });
+  document.getElementById("hm-ramp").innerHTML = `<span>stronger with lower values</span>${[...RED].reverse().map(c => `<i style="background:${c}"></i>`).join("")}` +
+    `<i style="background:${darkMode() ? "#383835" : "#f0efec"};outline:1px solid var(--ring)"></i>${BLUE.map(c => `<i style="background:${c}"></i>`).join("")}<span>stronger with higher values</span>`;
+}
+
+// ---------- DCAPE scatters
+const MILLI = ["div_low_s", "conv_mid_s"];  // plotted in 10^-3 s^-1 so the axis reads 1, 2, 3
+function sc(id, rows, xk, yk, o) {
+  const k = MILLI.includes(yk) ? 1000 : 1;
+  const P = pts(rows, xk, yk).filter(p => p.x !== null && p.y !== null).map(p => ({ ...p, y: p.y * k }));
+  o = Object.assign({}, o || {});
+  if (o.cutY !== undefined && o.cutY !== null) o.cutY *= k;
+  PC.scatter(document.getElementById(id), Object.assign({ points: P, xLabel: (FAC[xk] || {}).label + (UNIT[xk] ? ` (${UNIT[xk]})` : ""),
+    yLabel: SIG[yk] ? `${SIG[yk].label} (${k > 1 ? "10⁻³ " : ""}${SIG[yk].unit})` : yk, onClick: goDay }, o));
+}
+const capR = (id, s, f, extra) => { document.getElementById(id).innerHTML = `${rtxt(s, f)}${extra ? " · " + extra : ""}`; };
+sc("sc-div", NEAR, "dcape_max_jkg", "div_low_s", { cutX: DC, cutY: DIV, cutLabel: "downburst threshold 2.5 × 10⁻³ s⁻¹" });
+capR("c-div", "div_low_s", "dcape_max_jkg", `radar within 100 km. Dashed lines: the outflow threshold and DCAPE ${DC.toLocaleString()} J/kg. Click a day to open it.`);
+sc("sc-conv", HD, "dcape_max_jkg", "conv_mid_s", { cutX: DC, cutY: DIV, cutLabel: "2.5 × 10⁻³ s⁻¹" });
+capR("c-conv", "conv_mid_s", "dcape_max_jkg", "all ranges");
+sc("sc-vrot", HD, "dcape_max_jkg", "vrot", { cutX: DC });
+capR("c-vrot", "vrot", "dcape_max_jkg", "all ranges");
+
+// ---------- horizontal bars: share reaching the outflow threshold / median outflow by DCAPE band
+function hbars(id, rows, fmtv, max) {
+  const host = document.getElementById(id), W = 380, bh = 30, L = 140, Hh = rows.length * (bh + 10) + 6;
+  host.querySelectorAll("svg").forEach(s => s.remove());
+  const svg = mk("svg", { viewBox: `0 0 ${W} ${Hh}`, class: "hbar", role: "img", "aria-label": rows.map(r => r.label + " " + fmtv(r)).join("; ") });
+  host.prepend(svg);
+  rows.forEach((r, i) => {
+    const y = 4 + i * (bh + 10), w = Math.max((W - L - 70) * (r.v || 0) / max, 2);
+    mk("text", { x: L - 8, y: y + bh / 2 + 5, "text-anchor": "end", class: "lab" }, svg).textContent = r.label;
+    mk("rect", { x: L, y, width: w, height: bh, rx: 4, fill: r.color }, svg);
+    mk("text", { x: L + w + 6, y: y + bh / 2 + 5 }, svg).textContent = fmtv(r);
+  });
+}
+(() => {
+  const o = NEAR.filter(d => d.div_low_s !== null && d.dcape_max_jkg !== null);
+  const bands = [[`below ${DC.toLocaleString()}`, d => d.dcape_max_jkg < DC, "#86b6ef"],
+    [`${DC.toLocaleString()} or more`, d => d.dcape_max_jkg >= DC, "#104281"]].map(([label, f, color]) => {
+    const g = o.filter(f); return { label: label + " J/kg", g, color, n: g.length, k: g.filter(d => d.div_low_s >= DIV).length };
+  });
+  hbars("hit", bands.map(b => ({ ...b, v: b.n ? b.k / b.n : 0 })), r => `${r.k} of ${r.n}`, 1);
+  hbars("med", bands.map(b => ({ ...b, v: med(b.g.map(d => d.div_low_s)) })), r => r.v === null ? "–" : (r.v * 1000).toFixed(1) + " × 10⁻³ s⁻¹",
+    Math.max(...bands.map(b => med(b.g.map(d => d.div_low_s)) || 0)) * 1.05 || 1);
+})();
+
+// ---------- core vs no-core dot comparison
+function twoStrip(id, rows, k, label, cut) {
+  const host = document.getElementById(id); host.querySelectorAll("svg").forEach(s => s.remove());
+  const groups = [["core", rows.filter(d => d.z95_max !== null)], ["no core", rows.filter(d => d.z95_max === null)]];
+  const vals = rows.map(d => d[k]).filter(v => v !== null);
+  const W = 380, Hh = 300, m = { l: 62, r: 12, t: 12, b: 36 }, lo = Math.floor(Math.min(0, ...vals) * 1000) / 1000;
+  const step = Math.max(Math.ceil((Math.max(...vals, cut || 0) - lo) * 1000 / 4 * 2) / 2, 0.5) / 1000, hi = lo + step * 4;
+  const y = v => Hh - m.b - (v - lo) / (hi - lo || 1) * (Hh - m.t - m.b), bw = (W - m.l - m.r) / 2;
+  const svg = mk("svg", { viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": `${label}, days with and without a precipitation core` });
+  host.prepend(svg);
+  const ax = mk("g", { class: "axis" }, svg);
+  for (let i = 0; i <= 4; i++) { const v = lo + step * i; mk("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), class: "gridline" }, ax);
+    mk("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }, ax).textContent = (v * 1000).toFixed(1); }
+  mk("text", { x: 12, y: (m.t + Hh - m.b) / 2, "text-anchor": "middle", class: "alabel", transform: `rotate(-90 12 ${(m.t + Hh - m.b) / 2})` }, ax).textContent = label;
+  if (cut) mk("line", { x1: m.l, x2: W - m.r, y1: y(cut), y2: y(cut), class: "cutline" }, svg);
+  const tipEl = (() => { let t = host.querySelector(".tip"); if (!t) { t = document.createElement("div"); t.className = "tip"; host.appendChild(t); } return t; })();
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  groups.forEach(([name, g], i) => {
+    const cx = m.l + bw * (i + .5), md = med(g.map(d => d[k]));
+    mk("text", { x: cx, y: Hh - m.b + 18, "text-anchor": "middle", class: "alabel" }, ax).textContent = `${name} (${g.filter(d => d[k] !== null).length})`;
+    if (md !== null) { mk("line", { x1: cx - bw * .35, x2: cx + bw * .35, y1: y(md), y2: y(md), stroke: "var(--ink)", "stroke-width": 2 }, svg);
+      mk("text", { x: cx + bw * .37, y: y(md) + 4, class: "cutlabel" }, svg).textContent = "median"; }
+    g.filter(d => d[k] !== null).forEach(d => {
+      const c = mk("circle", { cx: cx + (rnd() - .5) * bw * .5, cy: y(d[k]), r: d.cls === "pyroCb" ? 7 : 5, fill: PC.color(d.cls), class: "pt", tabindex: 0 }, svg);
+      c.addEventListener("mousemove", ev => { tipEl.innerHTML = hazTip(d); tipEl.style.display = "block"; const rr = host.getBoundingClientRect();
+        let xx = ev.clientX - rr.left + 14; if (xx + 290 > rr.width) xx = ev.clientX - rr.left - 290; tipEl.style.left = Math.max(0, xx) + "px"; tipEl.style.top = (ev.clientY - rr.top + 14) + "px"; });
+      c.addEventListener("mouseleave", () => tipEl.style.display = "none");
+      c.addEventListener("click", () => goDay(d));
+    });
+  });
+}
+twoStrip("cc-div", NEAR, "div_low_s", "outflow (10⁻³ s⁻¹)", DIV);
+twoStrip("cc-conv", NEAR, "conv_mid_s", "convergence (10⁻³ s⁻¹)", DIV);
+(() => {
+  const c = NEAR.filter(d => d.z95_max !== null), n = NEAR.filter(d => d.z95_max === null);
+  const f = (g, k) => ((med(g.map(d => d[k])) || 0) * 1000).toFixed(1);
+  document.getElementById("c-core").innerHTML = `Median outflow <b>${f(c, "div_low_s")}</b> × 10⁻³ s⁻¹ with a core against ${f(n, "div_low_s")} without; ` +
+    `mid-level convergence <b>${f(c, "conv_mid_s")}</b> against ${f(n, "conv_mid_s")}. Radar within 100 km; the dashed line is the 2.5 × 10⁻³ s⁻¹ threshold, the bar each group's median.`;
+})();
+
+// ---------- PCAPE / z_fc small multiples
+sc("sc-zp", NEAR, "pcape_max_jkg", "z95_max"); capR("c-zp", "z95_max", "pcape_max_jkg");
+sc("sc-zz", NEAR, "z_fc_km", "z95_max"); capR("c-zz", "z95_max", "z_fc_km", "lower z_fc, stronger core");
+sc("sc-dp", NEAR, "pcape_max_jkg", "div_low_s", { cutY: DIV }); capR("c-dp", "div_low_s", "pcape_max_jkg");
+sc("sc-dz", NEAR, "z_fc_km", "div_low_s", { cutY: DIV }); capR("c-dz", "div_low_s", "z_fc_km");
+
+// ---------- explore any pair
+const exS = document.getElementById("ex-s"), exF = document.getElementById("ex-f");
+exS.innerHTML = (H ? H.signatures : []).map(s => `<option value="${s.col}">${s.label}</option>`).join("");
+exF.innerHTML = (H ? H.factors : []).map(f => `<option value="${f.col}">${f.label}</option>`).join("");
+function explore() {
+  const s = SIG[exS.value], rows = s.scope === "near" ? NEAR : HD;
+  sc("sc-ex", rows, exF.value, exS.value, { xLog: exF.value === "ratio_max", cutY: ["div_low_s", "conv_mid_s"].includes(exS.value) ? DIV : null });
+  capR("c-ex", exS.value, exF.value, s.scope === "near" ? "radar within 100 km" : "all ranges");
+}
+exS.addEventListener("change", explore); exF.addEventListener("change", explore);
+explore();
+
+// ---------- precursor counts by class
+(() => {
+  const P = [["Precipitation core", d => d.z95_max !== null], ["Descending KDP core", d => yes(d.kdp_core_desc)],
+    ["Descending reflectivity core", d => yes(d.drc)], ["ZDR trough", d => yes(d.zdr_trough)], ["ρhv drop", d => yes(d.rho_drop)]];
+  const host = document.getElementById("pc"), W = 760, L = 210, bh = 16, gap = 18, Hh = P.length * (bh * 2 + 4 + gap) + 4;
+  const svg = mk("svg", { viewBox: `0 0 ${W} ${Hh}`, class: "hbar", role: "img", "aria-label": "Downburst precursors by plume class" });
+  host.prepend(svg);
+  P.forEach(([name, f], i) => {
+    const y0 = 4 + i * (bh * 2 + 4 + gap);
+    mk("text", { x: L - 10, y: y0 + bh + 6, "text-anchor": "end" }, svg).textContent = name;
+    ["pyroCb", "pyroCu"].forEach((c, j) => {
+      const g = NEAR.filter(d => d.cls === c), k = g.filter(f).length, w = Math.max((W - L - 90) * (g.length ? k / g.length : 0), 2), y = y0 + j * (bh + 4);
+      mk("rect", { x: L, y, width: w, height: bh, rx: 4, fill: PC.color(c) }, svg);
+      mk("text", { x: L + w + 6, y: y + bh - 3, class: "lab" }, svg).textContent = `${k} of ${g.length} ${c}`;
+    });
+  });
+})();
+
+// ---------- time-height figure browser
+(() => {
+  const items = (H ? H.figures : []).map(f => { const id = f.replace(/^polar_|\.png$/g, ""), day = id.slice(-10), fire = id.slice(0, -11);
+    const d = HD.find(x => x.id === id) || {}; return { id, fire, day, cls: d.cls || "pyroCu", img: "img/radar/" + f, d }; });
+  PG.browser(document.getElementById("browser"), { items, featured: c => c.cls === "pyroCb", featuredLabel: "PyroCb days", stack: true,
+    pane: c => `<h3>${PG.fireLabel(c.fire)} · ${c.day} <span class="badge ${c.cls}">${PC.CLS_NAME[c.cls]}</span></h3>
+      <p class="note">DCAPE ${PC.fmt(c.d.dcape_max_jkg, 0)} J/kg · PCAPE ${PC.fmt(c.d.pcape_max_jkg, 0)} J/kg · outflow ${sci(c.d.div_low_s)} s⁻¹ · radar ${PC.fmt(c.d.range_km, 0)} km away</p>
+      <img src="${c.img}" alt="Time-height radar picture of the precipitation core over ${PG.fireLabel(c.fire)} on ${c.day}" loading="lazy"
+        style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+      <p class="note"><a href="radar.html?case=${c.id}">radar pictures</a> · <a href="soundings.html?case=${c.id}">sounding</a> ·
+        <a href="explore.html?x=dcape_max_jkg&y=pcape_max_jkg&day=${c.id}">this day's numbers</a> ·
+        <a href="#read-th">how to read this picture</a></p>` });
+})();
+
+// ---------- DCAPE sounding example: the pyroCb day with the highest DCAPE that has a sounding
+(() => {
+  const s = D.filter(d => d.cls === "pyroCb" && d.sounding_img && d.dcape_max_jkg !== null).sort((a, b) => b.dcape_max_jkg - a.dcape_max_jkg)[0];
+  if (s) document.getElementById("snd").innerHTML = `<img src="${s.sounding_img}" alt="HRRR sounding, ${PG.fireLabel(s.fire)} ${s.day}" loading="lazy"
+    style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff;cursor:zoom-in" onclick="PG.lightbox()(this.src, this.alt)">
+    <p class="cap">${PG.fireLabel(s.fire)}, ${s.day} (pyroCb): DCAPE ${PC.fmt(s.dcape_max_jkg, 0)} J/kg, the highest of the pyroCb days with a sounding.</p>`;
+})();
+
+// ---------- morning brief
+(() => {
+  const MB = Object.fromEntries((PYRO.scores.moisture_baseline || []).map(r => [r.measure, r]));
+  const e = (k, d) => MB[k] ? `${MB[k].drier_when === "low" ? "≤" : "≥"} ${PC.fmt(MB[k].envelope_edge, d)}${MB[k].unit ? " " + MB[k].unit : ""}` : "–";
+  const FC = Object.fromEntries((PYRO.scores.forecast || []).map(r => [r.column, r]));
+  const fc = (k, d) => FC[k] ? PC.fmt(FC[k].pooled_cut, d) : "–";
+  const fh = k => FC[k] ? `${FC[k].lofo_hit} pyroCb days held out, ${FC[k].lofo_fa} others flagged` : "–";
+  const t = k => TH[k] ? `${TH[k].higher_is_pyroCb ? "≥" : "≤"} ${PC.fmt(TH[k].pooled_cut, k === "ratio_max" ? 2 : 0)}` : "–";
+  const rows = [
+    ["Are fuels dry enough?", "PSA 1000-h fuel moisture; ERC (fuel model Y)", `${e("fm1000_psa", 1)}; ERC ${e("erc_psa", 0)}`, "Every pyroCb day inside; a precondition only", "factor-guide.html#baseline"],
+    ["Can the air make a pyroCb?", "Morning HRRR PFT at yesterday's front (IA report Watch)", `≤ ${fc("pft_fc_min", 0)} GW`, fh("pft_fc_min"), "forecast.html"],
+    ["Is the fire strong enough?", "Yesterday's peak fire power ÷ forecast PFT (IA report Warning, set at 0.13); same-day FP ÷ PFT", `best cut ≥ ${fc("r_prev_goes_fc", 2)}; same day ${t("ratio_max")}`, `${fh("r_prev_goes_fc")}; same day ${TH.ratio_max ? TH.ratio_max.pooled_hit : "–"} pyroCb days`, "factors.html"],
+    ["How much energy aloft?", "PCAPE (pyroCb parcel)", `${t("pcape_max_jkg")} J/kg`, "Heavier cores with more", "factor-guide.html#g-pcape_max_jkg"],
+    ["<b>How hard can downdrafts hit?</b>", "<b>DCAPE</b>", `<b>≥ ~${DC.toLocaleString()} J/kg</b>`, "Outflow on 10 of 13 days above, 5 of 12 below", "#signatures"],
+    ["During the shift: is it a pyroCb?", "Radar fire-rooted column top (usable radars)", "≥ 10.8 km", "Every pyroCb on usable radars", "radar.html"],
+    ["During the shift: is a downburst coming?", "Precipitation core over the fire; descending K_DP or reflectivity core; mid-level convergence", "core ≥ 30 dBZ; K_DP > 1 °/km descending; convergence ≥ 0.0025 s⁻¹", "Precursors precede the outflow", "#precursors"],
+  ];
+  document.getElementById("brief").innerHTML = `<tr><th>Question</th><th>Indicator</th><th>Watch for</th><th>In this study</th><th>More</th></tr>` +
+    rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="n">${r[2]}</td><td>${r[3]}</td><td><a href="${r[4]}">→</a></td></tr>`).join("");
+})();
+
+heatmap();
+document.querySelector(".theme-btn").addEventListener("click", () => setTimeout(heatmap, 0));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", heatmap);
+</script></body></html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satellite Cloud Tops · PyroCb Research</title>
+<meta name="description" content="GOES infrared cloud-top panels behind every pyroCb, pyroCu and no-deep-cloud call on 23 California fires, how to read them, and whether the OMPS aerosol index marks pyroCb days.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Satellite: how tall did the plume cloud get?</h1>
+<p class="sub">Every class on this site comes from the GOES-West weather satellite's infrared view of the cloud tops above
+the fire. These are the panels each day was judged from: the automatic rules flagged the day, then a reviewer looked at
+these pictures and made the final call.</p>
+
+<div data-guide="guide.html#sa-panels" class="card"><h2>How to read the panels</h2>
+<div class="grid2">
+<div>
+<h3>What the colours are</h3>
+<p>The colour is the <b>brightness temperature</b> in GOES band 13 (10.3 µm, "clean" infrared), roughly the temperature
+of whatever the satellite sees first: the ground on a clear day, the top of a thick cloud otherwise. The air cools with
+height, so <b>colder means taller</b>.</p>
+<ul>
+<li>Dark blues and greens (above about 0 °C): the ground, smoke, or low cloud. Smoke itself barely shows: it is thin in the infrared.</li>
+<li>Yellows and reds (−20 to −40 °C): cloud tops roughly 7 to 9 km up. The grey contour is −20 °C, the
+<a href="methods.html#classes">pyroCu</a> line.</li>
+<li>Magenta and white (colder than −40 °C): glaciated, thunderstorm-depth tops, 9–10 km and higher. The black contour is
+−40 °C, the pyroCb line.</li>
+</ul>
+<p>Black circles are the GOES fire pixels from the past hour: where the fire is burning hot enough for the satellite to detect.</p>
+</div>
+<div>
+<h3>The four panels</h3>
+<p>Each strip shows four scans: an hour and 20 minutes before the day's coldest cloud top near the fire, that scan, and
+40 minutes after. A no-deep-cloud day is centred on its coldest (often still warm) plume top.</p>
+<p>The strip's title gives the <b>automatic</b> call; the badge above each strip is the <b>final</b> class after review, and the
+reviewer's reason is shown when there is one.</p>
+<h3>What to look for</h3>
+<ul>
+<li><b>PyroCb</b>: a cold core that grows over or just downwind of the fire circles, crosses −40 °C and spreads into an anvil,
+with no other storms that cold nearby.</li>
+<li><b>PyroCu</b>: the same kind of rooted cloud stopping between −20 and −40 °C.</li>
+<li><b>Ordinary storms over fire</b>: cold cells and anvils all around, or a cloud deck over everything: a pyroCb could be
+hiding in it, so these days are left out of the scores.</li>
+<li><b>No deep plume cloud</b>: a warm smoke plume or a small cumulus cap, even on a huge run.</li>
+</ul>
+<p class="note">The panels show positions as GOES sees them. A tall cloud appears displaced away from the satellite, which sits
+over the equator at 137°W: a 12 km top over California shows up about 12–14 km north-northeast of where it really is,
+so a pyroCb anvil can look as if it is beside the fire rather than on it. The classification corrects for this.</p>
+</div>
+</div></div>
+
+<div data-guide="factor-guide.html#g-omps_ai_d0" class="card" id="omps"><h2>Smoke aloft: the OMPS aerosol index</h2>
+<p>A pyroCb lifts smoke far higher than an ordinary plume. The OMPS instruments on the Suomi NPP, NOAA-20 and NOAA-21
+satellites measure the <b>UV Aerosol Index</b> (AI). It is high where smoke or dust sits above the ground, and higher the
+higher the smoke sits. In October 2026 NASA FIRMS added a "pyrocumulonimbus" version of the layer on a 0–50 scale; values
+above about 10 usually mean smoke in the upper troposphere or lower stratosphere. Each satellite passes once a day, at about
+13:30 local time, so a pyroCb that forms later shows up on the next day's pass, downwind.</p>
+<p>The study read it two ways for every fire day: the peak AI within 150 km of the fire front on that day's pass, and the peak
+within 500 km on the next day's pass. Both are on <a href="factors.html#f-omps_ai_d0">Factors</a> and
+<a href="explore.html?x=omps_ai_d0&y=ratio_max">Explore</a>.</p>
+<h3>2017–2024 study fires: no</h3>
+<p>Only Suomi NPP covers these fires, with pixels 50 km across.</p>
+<ul>
+<li>Of 12 pyroCb days, only the Creek Fire's (5–7 September 2020) clearly passed AI 10.</li>
+<li>The single-cell pyroCbs of Dixie, Carr, Loyalton, Sugar, Castle and Line read 2–8, the same as an ordinary smoky day.</li>
+<li>In September 2020 the smoke from several big fires pushed no-plume days to 10–21.</li>
+<li>With each fire held out, the same-day value scored a balanced accuracy of 0.65 and the next-day value 0.50, against 0.94
+for radar.</li>
+</ul>
+<h3>2025–26 test with the finer pixels: not enough cases yet</h3>
+<p>NOAA-20 (17 km, from June 2025) and NOAA-21 (12 km, from July 2026) see smaller plumes. To test them, 14 fires that MTBS
+hasn't mapped yet were run through the same GOES cloud-top classification, using the NIFC interagency perimeters:</p>
+<ul>
+<li><b>every California wildfire over 3,000 acres</b> from June 2025 to October 2026 in the interagency perimeter list:
+24 fires and 124 fire days, from Madre, Gifford and Garnet in 2025 to Biscar, Bug, Plaskett and Dome in 2026;</li>
+<li>five western fires with published pyroCbs: Dragon Bravo and Bronco in Arizona, Monroe Canyon and Cottonwood in Utah, and
+Dollar Lake in Wyoming.</li>
+</ul>
+<p>Every automatic pyroCb day and every pyroCu day colder than −35 °C was checked by eye. <b>No California fire had a
+clean pyroCb day in those 17 months.</b> Its 124 days split into:</p>
+<ul>
+<li>86 with no deep plume cloud;</li>
+<li>23 pyroCu;</li>
+<li>15 with ordinary thunderstorms over or beside the fire (Garnet, Bug, Dillon, Dome and others).</li>
+</ul>
+<p>The only three clean pyroCbs were the western ones: Dollar Lake, Bronco and Cottonwood.</p>
+<div class="scroll"><table>
+<tr><th>Fires (ambiguous days out)</th><th>Pass</th><th class="n">pyroCb ≥ 10</th><th class="n">pyroCu ≥ 10</th><th class="n">no plume ≥ 10</th><th class="n">pyroCb ≥ 15</th><th class="n">no plume ≥ 15</th></tr>
+<tr><td>2025–26 test, NOAA-20/21</td><td>same day, 150 km</td><td class="n">2/3</td><td class="n">7/45</td><td class="n">4/107</td><td class="n">2/3</td><td class="n">1/107</td></tr>
+<tr><td>2025–26 test, NOAA-20/21</td><td>next day, 500 km</td><td class="n">2/3</td><td class="n">12/45</td><td class="n">10/107</td><td class="n">1/3</td><td class="n">4/107</td></tr>
+<tr><td>2017–24 study, Suomi NPP</td><td>same day, 150 km</td><td class="n">3/12</td><td class="n">7/54</td><td class="n">15/342</td><td class="n">2/12</td><td class="n">2/342</td></tr>
+<tr><td>2017–24 study, Suomi NPP</td><td>next day, 500 km</td><td class="n">3/12</td><td class="n">10/53</td><td class="n">34/344</td><td class="n">2/12</td><td class="n">7/344</td></tr>
+</table></div>
+<p>Two of the three pyroCb days read high on the finer layer (Dollar Lake 15.5, Cottonwood 23.3). Across all 152 pyroCu and
+no-plume days, only one same-day reading reached 15: Garnet's biggest run, 7 September 2025, which was thick low smoke
+(map below). So a reading of 15 or more is rare without a pyroCb. Even so, three cases settle nothing:</p>
+<ul>
+<li><b>Cottonwood</b>'s pyroCb formed at night, after the pass. Its high reading most likely came from the first day's
+19,000-acre run.</li>
+<li><b>Bronco</b>'s pyroCb also formed after the pass, and read only 3.3.</li>
+<li>Readings of 10 or more still turn up on about one no-plume day in 25 and one pyroCu day in 6.</li>
+</ul>
+<p>For now the layer shows where smoke went high, not which days were pyroCb. The test will be re-run as NOAA-21 seasons add
+California pyroCb days.</p>
+<div class="grid2">
+<figure style="margin:0"><img src="img/omps/creek_2020-09-06.png" alt="OMPS aerosol index map, 6 September 2020, peak 21.5 over the Creek Fire" loading="lazy" style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+<figcaption class="note">Creek Fire, 6 Sep 2020 (Suomi NPP, 50 km): the day after its first pyroCb, AI 21.5 over the Sierra and into Nevada.</figcaption></figure>
+<figure style="margin:0"><img src="img/omps/dollar_lake_2025_2025-08-22.png" alt="OMPS aerosol index map, 22 August 2025, a streak of AI 10 to 15 east of the Dollar Lake Fire" loading="lazy" style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+<figcaption class="note">Dollar Lake Fire, Wyoming, 22 Aug 2025 (NOAA-20, 17 km): the pass caught the pyroCb as it formed, a 150 km streak of AI 10–15 downwind.</figcaption></figure>
+<figure style="margin:0"><img src="img/omps/cottonwood_2026_2026-06-23.png" alt="OMPS aerosol index map, 23 June 2026, high values near the Cottonwood Fire" loading="lazy" style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+<figcaption class="note">Cottonwood Fire, Utah, 23 Jun 2026 (NOAA-20): AI 23 at 13:30, hours before that night's pyroCb. This is most likely smoke from the previous day's run.</figcaption></figure>
+<figure style="margin:0"><img src="img/omps/garnet_2025_2025-09-07.png" alt="OMPS aerosol index map, 7 September 2025, AI about 15 just north of the Garnet Fire" loading="lazy" style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+<figcaption class="note">Garnet Fire, 7 Sep 2025 (NOAA-20): AI 15 beside the fire on a day with no deep plume cloud. Readings like this keep the layer from being a test.</figcaption></figure>
+</div>
+<p class="note">Data: NASA EOSDIS GIBS / OMPS. Source: NASA Earthdata, "New Higher-Resolution Aerosol Index and Pyrocumulonimbus
+Layers Now Available in NASA FIRMS" (13 October 2026). The 2025–26 test fires' GOES panels are not in the browser below.</p>
+</div>
+
+<div data-guide="guide.html#sa-panels" class="card"><h2>Browse and compare</h2>
+<p class="note">Every pyroCb, pyroCu and storm day, plus each fire's two biggest days and any no-deep-cloud day whose
+plume top still reached −10 °C. Pick a second day to see it underneath; click a panel to enlarge it.</p>
+<div id="browser"></div>
+</div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("satellite.html");
+const f = PC.fmt;
+const items = PYRO.days.filter(d => d.review_img).sort((a, b) => a.fire < b.fire ? -1 : a.fire > b.fire ? 1 : a.day < b.day ? -1 : 1);
+PG.browser(document.getElementById("browser"), {
+  items, featured: d => d.cls === "pyroCb", featuredLabel: "PyroCb days, all fires", stack: true,
+  pane: d => `<h3>${PG.fireLabel(d.fire)} · ${d.day} <span class="badge ${d.cls}">${PC.CLS_NAME[d.cls]}</span></h3>
+    <p class="note">Coldest fire-rooted top ${d.bt_rooted_min !== null ? f(d.bt_rooted_min, 0) + " °C" : "–"} · growth ${f(d.growth_ac, 0)} ac
+      · peak fire power ${f(d.fp_max_gw, 0)} GW${d.note ? `<br><b>Reviewer:</b> ${d.note}` : ""}</p>
+    <img src="${d.review_img}" alt="GOES 10.3 µm cloud-top panels for ${PG.fireLabel(d.fire)} on ${d.day}" loading="lazy"
+      style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+    <p class="note"><a href="explore.html?x=pft_min_gw&y=fp_max_gw&day=${d.id}">This day's numbers →</a> ·
+      <a href="soundings.html?case=${d.id}">sounding</a> · <a href="radar.html?case=${d.id}">radar</a></p>`,
+});
+</script></body></html>

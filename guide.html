@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel Guide · PyroCb Research</title>
+<meta name="description" content="How every chart, table and picture on the pyroCb research site is made, how to read it, its limits, and the research and data products it comes from.">
+<link rel="stylesheet" href="site.css">
+<style>
+.gd { display: grid; grid-template-columns: 150px 1fr; gap: 6px 16px; margin: 6px 0 0; }
+.gd dt { font-weight: 600; color: var(--ink-2); font-size: 14px; }
+.gd dd { margin: 0; }
+.gd dd p:first-child { margin-top: 0; }
+@media (max-width: 640px) { .gd { grid-template-columns: 1fr; } .gd dt { margin-top: 8px; } }
+.where { font-size: 13px; font-weight: 600; color: var(--ink-2); margin-left: 6px; }
+.back { font-size: 13px; margin: 10px 0 0; }
+.toc { columns: 2 260px; font-size: 14px; }
+.toc h3 { margin: 10px 0 4px; font-size: 14px; break-after: avoid; }
+.toc a { display: block; padding: 1px 0; }
+.src a { white-space: nowrap; }
+</style></head><body><div class="wrap">
+<h1>Panel guide</h1>
+<p class="sub">Every chart, table and picture on this site: what it shows, how it is made, how to read it, where it can
+mislead, and the research and data products behind it. Each panel elsewhere on the site links here with
+"About this panel". The factors themselves are explained in depth in the <a href="factor-guide.html">Factor guide</a>,
+the soundings in the <a href="sounding-guide.html">Sounding guide</a>, and the radar precursor statistics on the
+<a href="radar.html#percentiles">Radar page</a>.</p>
+
+<div class="card"><h2>Contents</h2><div class="toc" id="toc"></div></div>
+
+<!-- ======================================================== shared -->
+<h2 style="margin-top:28px" id="sec-shared">Shared conventions</h2>
+
+<div class="card" id="charts"><h2>The site's charts: dots, colours, cuts and axes</h2>
+<dl class="gd">
+<dt>Colours</dt><dd><p>Every dot or bar is one <b>fire day</b> (06:00 to 06:00 local time), coloured by what its plume did: orange
+pyroCb, blue pyroCu, green ordinary thunderstorms over the fire, grey no deep plume cloud. The class comes from GOES cloud-top
+temperature (<a href="#classes">next panel</a>). PyroCb dots are drawn larger and on top so the few of them are never hidden.</p></dd>
+<dt>Strip charts</dt><dd><p>One column per plume class, each day jittered sideways at random (the sideways position means nothing).
+A factor is useful when the orange column sits apart from the others.</p></dd>
+<dt>Scatter plots</dt><dd><p>Two factors against each other. A diagonal labelled "0.25" or "1:1" marks a fixed ratio between the
+axes, for example fire power equal to a quarter of the PFT.</p></dd>
+<dt>Dashed lines</dt><dd><p>The <b>best cut</b>: the threshold that best separates pyroCb days from the rest, chosen on all fires
+(balanced accuracy, below). The score quoted with it is from the <b>leave-one-fire-out</b> test, which is the honest one.</p></dd>
+<dt>Log axes</dt><dd><p>Fire power, PFT and their ratio span three orders of magnitude, so they are drawn on log scales: equal
+distances are equal <i>ratios</i>. A PFT with no solution (air too dry or stable for any pyroCb) is drawn at the top of a log axis
+or marked ×.</p></dd>
+<dt>Interaction</dt><dd><p>Hover a mark for its numbers; click a day to open it on <a href="explore.html">Explore days</a>.</p></dd>
+<dt>Scores</dt><dd><p><b>Balanced accuracy</b> = the average of the share of pyroCb days caught and the share of other days
+correctly left alone (0.5 = chance, 1 = perfect), so the many non-pyroCb days can't flatter a rule [<a href="#r-B10">B10</a>].
+<b>Leave-one-fire-out</b>: the cut is chosen on all fires but one, tried on the one left out, and repeated for every fire, so a rule
+that only fits one fire scores badly. Ordinary-storm days are left out of every score: the satellite can't tell whether a pyroCb
+hid among them.</p></dd>
+<dt>Rank correlations</dt><dd><p>Where relationships are tested (Firefighter safety), Spearman's ρ is used: it compares the
+<i>order</i> of the days, not their values, so one extreme day can't drive it [<a href="#r-SP04">SP04</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-B10">B10</a>] · [<a href="#r-SP04">SP04</a>] · method: <a href="methods.html">Methods &amp; sources</a></dd>
+</dl></div>
+
+<div class="card" id="classes"><h2>The plume classes</h2>
+<dl class="gd">
+<dt>What it is</dt><dd><p>The label every day carries: pyroCb, pyroCu, ordinary storms over the fire, or no deep plume cloud.</p></dd>
+<dt>How it's made</dt><dd><p>GOES-West band 13 (10.3 µm "clean" infrared) brightness temperature every 10 minutes, 11:00–23:00 PDT
+[<a href="#r-SC17">SC17</a>]. A cloud counts as rooted on the fire when its connected cold area reaches within 20 km of a GOES fire pixel
+from the past hour, after a parallax correction. PyroCb: a rooted top colder than −40 °C in at least two scans with no other cloud
+that cold within 100 km. PyroCu: colder than −20 °C but not a pyroCb. Every automatic call was then reviewed by eye on the
+<a href="satellite.html">satellite panels</a>.</p></dd>
+<dt>Why these limits</dt><dd><p>Below about −40 °C cloud water freezes almost completely, so a top that cold is glaciated,
+thunderstorm-depth cloud. This is the same infrared approach used to inventory pyroCb from geostationary satellites
+[<a href="#r-P17">P17</a>; <a href="factor-guide.html#r-F10">F10</a>].</p></dd>
+<dt>Limits</dt><dd><p>An anvil from a nearby storm can drift over the fire; cloud shields hide what is underneath (hence the
+ordinary-storms class); a brief pyroCb between scans or one under 2 km² of cold cloud can be missed.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-SC17">SC17</a>] · [<a href="#r-P17">P17</a>] · [<a href="factor-guide.html#r-F10">F10</a>] · GOES-16/17/18 ABI L1b and FDC via NOAA Open Data on AWS ·
+full rules: <a href="methods.html#classes">Methods</a></dd>
+</dl></div>
+
+<!-- ======================================================== overview -->
+<h2 style="margin-top:28px" id="sec-index">Overview</h2>
+
+<div class="card" id="idx-findings"><h2>What we found <span class="where">Overview</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The study's headline results in plain words, written from the scored tables (they are rebuilt with the
+site, not typed by hand).</p></dd>
+<dt>How to read it</dt><dd><p>Each finding points back to a page with its evidence: the separating tests to <a href="factors.html">Factors</a>,
+forecast skill to <a href="forecast.html">Forecasting</a>, patterns to <a href="patterns.html">Weather patterns</a>, hazards to
+<a href="safety.html">Firefighter safety</a>.</p></dd>
+<dt>Limits</dt><dd><p>Findings rest on 23 fires and a small number of pyroCb days; read them as leads with their held-out scores,
+not rules.</p></dd>
+<dt>Sources</dt><dd class="src">Framework: [<a href="factor-guide.html#r-TK21">TK21</a>] · data: see each panel below</dd>
+</dl></div>
+
+<div class="card" id="idx-roads"><h2>Two roads to a pyroCb <span class="where">Overview</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The two ways the study's fires reached a pyroCb: a modest fire under very favourable air (low PFT), or a
+very powerful fire under marginal air (high PFT). Both cross the same line, fire power against the threshold.</p></dd>
+<dt>Why it matters</dt><dd><p>It is the reason neither fire power alone nor the atmosphere alone separates pyroCb days, and why the
+ratio does. Tory &amp; Kepert (2021) frame pyroCb potential exactly this way: a property of the air (PFT) that a given fire either
+exceeds or not.</p></dd>
+<dt>See it</dt><dd><p><a href="explore.html?x=pft_min_gw&amp;y=fp_max_gw">Fire power against PFT</a> on Explore days.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-TK21">TK21</a>] · [<a href="factor-guide.html#r-TTK18">TTK18</a>] · GOES FRP [<a href="factor-guide.html#r-S20">S20</a>] · HRRR [<a href="factor-guide.html#r-D22">D22</a>]</dd>
+</dl></div>
+
+<div class="card" id="idx-holdup"><h2>Does it hold up? <span class="where">Overview</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Each rule's cut was set on the first seven fires, then applied unchanged to the sixteen added later
+(eight Northern California, eight Southern). The table counts days flagged out of days in each class, for the added fires and by
+region.</p></dd>
+<dt>How to read it</dt><dd><p>A rule that holds catches the added fires' pyroCb days while flagging few of their other days. A big
+drop from the original fires to the added ones means the cut was fitted to the original fires.</p></dd>
+<dt>Limits</dt><dd><p>"North" and "south" are the ONCC and OSCC Geographic Area Coordination Centers. Forecast rules need the
+previous morning's forecast, so each fire's first day is dropped from them.</p></dd>
+<dt>Sources</dt><dd class="src">Study scoring (<a href="#charts">conventions</a>) · fire list: MTBS [<a href="factor-guide.html#r-E07">E07</a>]</dd>
+</dl></div>
+
+<!-- ======================================================== explore -->
+<h2 style="margin-top:28px" id="sec-explore">Explore days</h2>
+
+<div class="card" id="ex-scatter"><h2>Any two factors <span class="where">Explore days</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Every studied fire day as a dot, any factor against any other, filtered by fire and class. The presets
+are the pairs the study found most telling, starting with fire power against PFT, the core test.</p></dd>
+<dt>How to read it</dt><dd><p>Look for where the orange dots gather against the rest. In the core test, pyroCb days sit above the
+dashed diagonal where fire power reaches about a quarter of the PFT. Tick "log" for factors spanning orders of magnitude.</p></dd>
+<dt>Limits</dt><dd><p>Day maxima and minima from different hours are paired, except FP/PFT, which is matched hour by hour. A factor
+missing for a day (no radar, no fuels data) drops that dot.</p></dd>
+<dt>Sources</dt><dd class="src">Each factor's sources are in the <a href="factor-guide.html">Factor guide</a></dd>
+</dl></div>
+
+<div class="card" id="ex-detail"><h2>A day's detail panel <span class="where">Explore days, Fires, Forecasting, Patterns</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Everything known about one fire day: class and coldest fire-rooted top, growth, weather regime and
+documented patterns, the PFT ingredients, PCAPE, moisture, radar plume top, fuels, the morning forecast, any analyst review note,
+the GOES cloud-top review strip and the HRRR sounding.</p></dd>
+<dt>How it's made</dt><dd><p>Growth from VIIRS and MODIS active-fire detections inside the final MTBS perimeter, dated by first
+detection [<a href="factor-guide.html#r-S14">S14</a>; <a href="factor-guide.html#r-G16">G16</a>; <a href="factor-guide.html#r-E07">E07</a>].
+PFT and its ingredients from HRRR analyses at the day's hot front, 12–22 PDT [<a href="factor-guide.html#r-D22">D22</a>;
+<a href="factor-guide.html#r-TK21">TK21</a>]. Fire power from GOES FRP [<a href="factor-guide.html#r-S20">S20</a>;
+<a href="factor-guide.html#r-W05">W05</a>]. 700 hPa moisture from ERA5 [<a href="factor-guide.html#r-H20">H20</a>]. Regime from the companion
+AI ensemble viewer (<a href="#pa-regimes">regimes</a>).</p></dd>
+<dt>How to read it</dt><dd><p>The two pictures: <a href="satellite.html">how to read the GOES strip</a>;
+<a href="sounding-guide.html#single">how to read the sounding</a>.</p></dd>
+<dt>Sources</dt><dd class="src">As listed · factor definitions: <a href="factor-guide.html">Factor guide</a></dd>
+</dl></div>
+
+<div class="card" id="ex-threshold"><h2>Threshold tool <span class="where">Explore days</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>What a "pyroCb likely" rule at any cut of any factor would have flagged: pyroCb days caught,
+pyroCu and no-deep-cloud days flagged, and the balanced accuracy, with the cut drawn on the factor's strip chart.</p></dd>
+<dt>How to read it</dt><dd><p>Drag the cut and watch the trade: catching every pyroCb usually costs many false alarms. "Best cut"
+finds the cut with the highest balanced accuracy on all fires; that is an optimistic, in-sample score. The held-out scores on
+<a href="factors.html">Factors</a> are the fair comparison.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-B10">B10</a>] · <a href="#charts">conventions</a></dd>
+</dl></div>
+
+<div class="card" id="ex-table"><h2>All days table <span class="where">Explore days</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Every fire day and its main numbers, sortable by any column. Click a row to open it.</p></dd>
+<dt>How to read it</dt><dd><p>Sort by FP/PFT to see the pyroCb days collect at the top; sort by growth to see that the largest
+runs are mostly not pyroCb days. "–" means not available for that day.</p></dd>
+<dt>Sources</dt><dd class="src">As the <a href="#ex-detail">detail panel</a></dd>
+</dl></div>
+
+<!-- ======================================================== factors -->
+<h2 style="margin-top:28px" id="sec-factors">Factors</h2>
+
+<div class="card" id="fa-rank"><h2>How the factors rank <span class="where">Factors</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Each factor's leave-one-fire-out balanced accuracy as a pyroCb test, best first.</p></dd>
+<dt>How to read it</dt><dd><p>0.5 is no better than a coin; above about 0.8 is a useful separator in this sample. Factors near 0.5
+can still matter physically (fuel moisture, for example, is a precondition every study day already met). Click a bar for the
+factor's chart and its <a href="factor-guide.html">guide entry</a>.</p></dd>
+<dt>Limits</dt><dd><p>Each factor gets its own best cut; factors are not combined here. Small differences (a few hundredths) are
+within what a single fire can swing.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-B10">B10</a>] · each factor: <a href="factor-guide.html">Factor guide</a></dd>
+</dl></div>
+
+<div class="card" id="fa-calc"><h2>PFT calculator <span class="where">Factors</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The pyroCb firepower threshold from its three ingredients, and where a day with your fire power would
+sit among the studied days.</p></dd>
+<dt>How it's made</dt><dd><p>The simplified form PFT ≈ 0.3 · z<sub>fc</sub>² · U<sub>ML</sub> · Δθ<sub>fc</sub> (GW, z in km). The study
+itself uses the full form with air density and an entrainment-weighted mixed layer from HRRR soundings
+[<a href="factor-guide.html#r-TK21">TK21</a>], which descends from plume-rise theory [<a href="factor-guide.html#r-MTT56">MTT56</a>].</p></dd>
+<dt>How to read it</dt><dd><p>z<sub>fc</sub> enters squared, so the height the plume must reach dominates: halving it quarters the
+threshold. The tiers match the study: FP/PFT around 0.25 and above is where its pyroCb days fell.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-TK21">TK21</a>] · [<a href="factor-guide.html#r-MTT56">MTT56</a>] · in depth: <a href="factor-guide.html#g-pft_min_gw">PFT</a></dd>
+</dl></div>
+
+<!-- ======================================================== fires -->
+<h2 style="margin-top:28px" id="sec-fires">Fires</h2>
+
+<div class="card" id="fi-locator"><h2>Where it burned <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Left: the fire (star) among all the study fires. Right: its final perimeter, each study day's hot front
+coloured by plume class, the radar used, towns and county lines.</p></dd>
+<dt>How it's made</dt><dd><p>Perimeters from MTBS (WFIGS for the 2025–26 test fires) [<a href="factor-guide.html#r-E07">E07</a>;
+<a href="#r-WFIGS">WFIGS</a>]. The hot front is the 0.1° cell with the most fire radiative power in that day's afternoon (12–17 PDT)
+VIIRS/MODIS detections: the point where the HRRR soundings and PFT are taken. Boundaries and towns from Natural Earth [<a href="#r-NE">NE</a>]; radar sites from the NEXRAD network
+[<a href="#r-CA93">CA93</a>].</p></dd>
+<dt>How to read it</dt><dd><p>Hot fronts show how far the fire moved between pyroCb days, and how far it sat from its radar (beyond
+about 100 km the lowest beam misses the low plume).</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-E07">E07</a>] · [<a href="#r-WFIGS">WFIGS</a>] · [<a href="#r-NE">NE</a>] · [<a href="#r-CA93">CA93</a>]</dd>
+</dl></div>
+
+<div class="card" id="fi-growth"><h2>Growth each fire day <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Acres burned each fire day (06:00–06:00 local), coloured by plume class.</p></dd>
+<dt>How it's made</dt><dd><p>The toolkit's satellite growth set. Each fire's MTBS event is matched to its Fire Program Analysis
+fire-occurrence records for the start date [<a href="#r-SH22">SH22</a>]. VIIRS 375 m and MODIS 1 km active-fire detections (NASA FIRMS) inside
+the final perimeter date the burned area: the perimeter is gridded at 100 m and each cell takes the earliest fire day among the detections
+near it (nearest-detection interpolation, after Parks 2014), so the daily acres add up to the perimeter's area
+[<a href="factor-guide.html#r-S14">S14</a>; <a href="factor-guide.html#r-G16">G16</a>; <a href="#r-D09">D09</a>; <a href="#r-P14">P14</a>]. The 2025–26
+test fires (WFIGS perimeters) count each 375 m VIIRS cell on the first day it burns, with GOES-19 filling gaps from 2025.
+A study day is any fire day with 1,000 acres or more of growth or 3,000 MW or more of total detected fire radiative power.</p></dd>
+<dt>How to read it</dt><dd><p>The biggest bars are often grey: wind-driven runs without deep plume cloud. PyroCb days are usually
+large but not the largest.</p></dd>
+<dt>Limits</dt><dd><p>Polar orbiters pass about twice a day each, so growth late in the day can land on the next day; cloud and
+thick smoke hide detections. Validated against the incident reports (IMSR) at rank correlation about 0.6 same day, 0.75 allowing
+one day's lag.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-S14">S14</a>] · [<a href="factor-guide.html#r-G16">G16</a>] · [<a href="#r-D09">D09</a>] · [<a href="#r-P14">P14</a>] · [<a href="factor-guide.html#r-E07">E07</a>] · [<a href="#r-SH22">SH22</a>]</dd>
+</dl></div>
+
+<div class="card" id="fi-fpline"><h2>Fire power against the threshold <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Each day's peak-hour fire power (orange) and the day's lowest PFT (grey), on one log axis in GW.
+× marks days with no PFT solution.</p></dd>
+<dt>How it's made</dt><dd><p>Fire power: GOES fire radiative power summed over the fire's pixels, hourly, × 3.9 to convert radiated
+to convective heat [<a href="factor-guide.html#r-S20">S20</a>; <a href="factor-guide.html#r-W05">W05</a>; <a href="factor-guide.html#r-TK21">TK21</a>].
+PFT: from HRRR analyses at the hot front, the lowest of 12–22 PDT [<a href="factor-guide.html#r-D22">D22</a>].</p></dd>
+<dt>How to read it</dt><dd><p>A pyroCb needs the orange line to come close to the grey one: in this study, to about a quarter of it
+or more. Watch for the grey line dropping (favourable air arriving) while the fire is still burning hard.</p></dd>
+<dt>Limits</dt><dd><p>The two lines are each the day's extreme and may come from different hours; the ratio panel below matches them
+hour by hour. GOES FRP undercounts under thick smoke and saturates on the most intense hours.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-S20">S20</a>] · [<a href="factor-guide.html#r-W05">W05</a>] · [<a href="factor-guide.html#r-TK21">TK21</a>] · [<a href="factor-guide.html#r-D22">D22</a>] · in depth: <a href="factor-guide.html#g-fp_max_gw">fire power</a>, <a href="factor-guide.html#g-pft_min_gw">PFT</a></dd>
+</dl></div>
+
+<div class="card" id="fi-ratio"><h2>FP ÷ PFT by day <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The fire's power divided by the threshold in the same hour, the day's highest value, with the study's
+best cut dashed.</p></dd>
+<dt>How to read it</dt><dd><p>Bars above the dashed line are days the fire out-powered the air enough for a pyroCb in the study's
+experience. A grey bar above it is a near miss or a pyroCb the satellite could not confirm; an orange bar below it is a miss.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-TK21">TK21</a>] · in depth: <a href="factor-guide.html#g-ratio_max">FP ÷ PFT</a></dd>
+</dl></div>
+
+<div class="card" id="fi-notable"><h2>Notable days <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The fire's pyroCb and pyroCu days, plus any day an analyst reviewed by hand, with growth and FP/PFT.
+Click a row for the <a href="#ex-detail">detail panel</a>.</p></dd>
+<dt>Sources</dt><dd class="src">As the <a href="#ex-detail">detail panel</a></dd>
+</dl></div>
+
+<div class="card" id="fi-fuels"><h2>Fuel conditioning <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>How the fuels dried into the study days: the fire's Predictive Services Area (PSA) Energy Release
+Component and 1000-h fuel moisture against that PSA's normal range and its 90th/97th (10th/3rd) percentile lines, gridMET 1000-h
+moisture at the fire, and NFDRS live fuel moisture. Study days are shaded orange (pyroCb) or blue (pyroCu).</p></dd>
+<dt>How it's made</dt><dd><p>NFDRS fuel model Y, averaged over the PSA's RAWS, from 75 days before the first study day
+[<a href="factor-guide.html#r-B84">B84</a>; <a href="#r-CD85">CD85</a>; <a href="factor-guide.html#r-J24">J24</a>]. The RAWS observations come from
+FEMS [<a href="#r-Z03">Z03</a>]; percentiles are on each PSA's full-year record, March 2005 to 2025, the same basis as the ONCC/OSCC fire
+danger charts. Live fuel moisture is the NFDRS growing-season-index model [<a href="#r-J05">J05</a>]. gridMET from
+[<a href="factor-guide.html#r-A13">A13</a>].</p></dd>
+<dt>How to read it</dt><dd><p>A pyroCb needs fuel dry enough to burn completely and fast: every study pyroCb day had PSA 1000-h at or
+below about 10.8% and ERC at or above about 54 (<a href="factor-guide.html#g-moisture-baseline">the moisture baseline</a>). It is a
+precondition: many dry days made no pyroCb.</p></dd>
+<dt>Limits</dt><dd><p>A PSA average blends stations that may be far from the fire; gridMET is the at-fire check.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-B84">B84</a>] · [<a href="#r-CD85">CD85</a>] · [<a href="factor-guide.html#r-J24">J24</a>] · [<a href="#r-J05">J05</a>] · [<a href="factor-guide.html#r-A13">A13</a>] · [<a href="#r-Z03">Z03</a>] · FEMS</dd>
+</dl></div>
+
+<div class="card" id="fi-weather"><h2>Surface weather: RAWS against ERA5 <span class="where">Fires</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Temperature, relative humidity and wind at the nearest reporting RAWS, against ERA5 at that RAWS and at
+the fire's hot front, through the study days.</p></dd>
+<dt>How it's made</dt><dd><p>RAWS hourly observations from FEMS [<a href="#r-Z03">Z03</a>]; ERA5 hourly reanalysis from the toolkit's
+archive [<a href="factor-guide.html#r-H20">H20</a>]. The bias and mean absolute error of ERA5 at the RAWS are printed on the figure.</p></dd>
+<dt>How to read it</dt><dd><p>It shows how far the gridded weather used elsewhere (ERA5 moisture, HRRR soundings) can be trusted at
+this fire, and what the fire's own surface weather was. Expect ERA5 winds to run low: RAWS wind is a 10-minute mean at 20 ft
+on exposed sites, ERA5 an hourly 10 m average over a 31 km cell.</p></dd>
+<dt>Limits</dt><dd><p>The nearest RAWS can be tens of kilometres away and in different terrain; on smoky days RAWS temperatures can
+read low under the smoke.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-Z03">Z03</a>] · [<a href="factor-guide.html#r-H20">H20</a>] · FEMS</dd>
+</dl></div>
+
+<!-- ======================================================== patterns -->
+<h2 style="margin-top:28px" id="sec-patterns">Weather patterns</h2>
+
+<div class="card" id="pa-regimes"><h2>Regimes and what the plume did <span class="where">Weather patterns</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>How often each 500 hPa regime (A–F) occurred on pyroCb, pyroCu and other days, as a lift (how much more
+often than on all studied days), with the median 700 hPa moisture at the fire.</p></dd>
+<dt>How it's made</dt><dd><p>The regimes are the companion AI ensemble viewer's: k-means clusters of daily 500 hPa height anomalies
+over the northeast Pacific and western North America, fire-season days 2001–2025, from the NCEP/NCAR Reanalysis 1
+[<a href="#r-K96">K96</a>]. Each study day takes its regime's label. Moisture is ERA5 700 hPa specific humidity at the hot front, the
+moister of 11 a.m. and 5 p.m. [<a href="factor-guide.html#r-H20">H20</a>].</p></dd>
+<dt>How to read it</dt><dd><p>A lift of 2 means the regime shows up twice as often on that class of day as on all days. Regimes are
+forecastable days ahead, which is their value: a heads-up before a fire's own power is known.</p></dd>
+<dt>Limits</dt><dd><p>Regimes are coarse (six patterns for a whole season); the same regime covers very different local weather.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-K96">K96</a>] · [<a href="factor-guide.html#r-H20">H20</a>] · <a href="https://bah7-humboldt.github.io/ca-ai-ensemble-research/">AI ensemble research viewer</a></dd>
+</dl></div>
+
+<div class="card" id="pa-rq"><h2>Regime against mid-level moisture <span class="where">Weather patterns</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Every fire day placed by its regime (columns, jittered) and its 700 hPa moisture (height).</p></dd>
+<dt>How to read it</dt><dd><p>PyroCb days need both a favourable regime (A, C or D) and moist mid-levels (about 3.7 g/kg or more at
+700 hPa, roughly 10,000 ft). Moisture there lowers the condensation level the plume has to reach and adds latent heat once it does,
+the effect monsoon surges bring under a hot ridge [<a href="factor-guide.html#r-TTK18">TTK18</a>; <a href="factor-guide.html#r-P05">P05</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-K96">K96</a>] · [<a href="factor-guide.html#r-H20">H20</a>] · [<a href="factor-guide.html#r-TTK18">TTK18</a>] · [<a href="factor-guide.html#r-P05">P05</a>] · in depth: <a href="factor-guide.html#g-q700_era5">700 hPa moisture</a></dd>
+</dl></div>
+
+<div class="card" id="pa-rules"><h2>Rules from regime and moisture <span class="where">Weather patterns</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Regime alone, moisture alone, and the two combined as pyroCb rules, each scored with every fire held
+out in turn.</p></dd>
+<dt>How to read it</dt><dd><p>The combined rule catches most pyroCb days days ahead, but flags many more days than FP/PFT does on the
+day. Use it to raise awareness early, then let the fire-against-air ratio decide.</p></dd>
+<dt>Sources</dt><dd class="src"><a href="#charts">Scoring conventions</a> · [<a href="#r-K96">K96</a>] · [<a href="factor-guide.html#r-H20">H20</a>]</dd>
+</dl></div>
+
+<div class="card" id="pa-comp"><h2>Composite 500 hPa maps <span class="where">Weather patterns</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The average 500 hPa height anomaly on pyroCb days, on pyroCu days, and on big-growth days (20,000 acres
+or more) without deep plume cloud.</p></dd>
+<dt>How it's made</dt><dd><p>Each day's NCEP/NCAR Reanalysis 1 500 hPa height minus that calendar day's 2001–2025 normal, averaged
+over the class [<a href="#r-K96">K96</a>]. Red = higher than normal (ridge), blue = lower (trough).</p></dd>
+<dt>How to read it</dt><dd><p>The pyroCb composite is a ridge over British Columbia with a trough offshore, which steers mid-level
+moisture north over a hot interior. The big no-plume runs are the offshore pattern: a coastal ridge with an inland trough, dry
+and windy. The same ingredients are documented in the regional critical-fire-weather literature
+[<a href="#r-S64">S64</a>; <a href="#r-W11">W11</a>].</p></dd>
+<dt>Limits</dt><dd><p>An average can look like no single day; a few strong days dominate small classes.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-K96">K96</a>] · [<a href="#r-S64">S64</a>] · [<a href="#r-W11">W11</a>]</dd>
+</dl></div>
+
+<div class="card" id="pa-cefa"><h2>Documented Northern California patterns <span class="where">Weather patterns</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Fire days flagged with the critical fire-weather patterns from the regional literature, counted by plume
+class: Northern California dry thunderstorms, northeast (offshore) foehn, southwest foehn, the ridge-breakdown stages, and a
+persisting ridge.</p></dd>
+<dt>How it's made</dt><dd><p>The companion viewer's objective event rules: dry thunderstorms = at least 500 lightning strikes in the ONCC
+PSAs; NE foehn = the San Francisco–Winnemucca pressure gradient past a cutoff; SW foehn = Reno 700 hPa southwest wind of 25 kt or
+more with a dry slot and few strikes; ridge breakdown stages from the regime sequence (last ridge day before a trough day, then the
+first trough day), after the Desert Research Institute's CEFA critical-fire thresholds [<a href="#r-CEFA">CEFA</a>], the NWCG field
+guide [<a href="#r-PMS437">PMS437</a>], the NWS critical patterns compendium [<a href="#r-NWS99">NWS99</a>] and the classic synoptic types
+[<a href="#r-S64">S64</a>].</p></dd>
+<dt>How to read it</dt><dd><p>Most pyroCb days came while a ridge persisted. Offshore (NE foehn) days drove some of the largest runs
+but almost never a pyroCb: the air is too dry for one, and the strong wind bends the plume over. Megafire growth responds most
+strongly to extreme wind [<a href="#r-PM21">PM21</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-CEFA">CEFA</a>] · [<a href="#r-PMS437">PMS437</a>] · [<a href="#r-NWS99">NWS99</a>] · [<a href="#r-S64">S64</a>] · [<a href="#r-W11">W11</a>] · [<a href="#r-PM21">PM21</a>] · lightning: Vaisala NLDN (counts only)</dd>
+</dl></div>
+
+<!-- ======================================================== forecast -->
+<h2 style="margin-top:28px" id="sec-forecast">Forecasting</h2>
+
+<div class="card" id="fc-tiers"><h2>Two tiers <span class="where">Forecasting</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>A hindcast of a morning pyroCb alert. <b>Watch</b>: the 12Z (05 PDT) HRRR afternoon forecast (f09–f15)
+at the fire front known that morning gives a PFT of 360 GW or less. <b>Warning</b>: Watch, and yesterday's peak satellite fire power
+reaches 0.13 of that forecast PFT. Counts by class, and a candidate third screen on forecast PCAPE.</p></dd>
+<dt>How to read it</dt><dd><p>"No solution" in the morning forecast was a strong all-clear in this sample: almost no pyroCb day
+came from a day the forecast said the air couldn't support one. These are the tiers behind the Initial Attack report's pyroCb line.</p></dd>
+<dt>Limits</dt><dd><p>Yesterday's fire power is persistence: a fire that blows up from a quiet day is missed by the Warning.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-TK21">TK21</a>] · HRRR [<a href="factor-guide.html#r-D22">D22</a>] · GOES FRP [<a href="factor-guide.html#r-S20">S20</a>]</dd>
+</dl></div>
+
+<div class="card" id="fc-scatter"><h2>Forecast against analysis PFT <span class="where">Forecasting</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Each day's lowest PFT as the morning forecast saw it against the HRRR analysis, on log axes; the dashed
+1:1 line is a perfect forecast.</p></dd>
+<dt>How to read it</dt><dd><p>Scatter along the line is forecast error in the PFT ingredients, mostly the free-convection height,
+which enters squared. Points above the line are days the forecast was too pessimistic.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-D22">D22</a>] · [<a href="factor-guide.html#r-TK21">TK21</a>]</dd>
+</dl></div>
+
+<div class="card" id="fc-measures"><h2>All forecast measures <span class="where">Forecasting</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Every forecast measure tried, each with its best cut and leave-one-fire-out score; analysis versions
+are included as references for what a perfect forecast would achieve.</p></dd>
+<dt>How to read it</dt><dd><p>Compare a FORECAST row with its analysis counterpart: the gap is the cost of forecasting. "AI-ensemble
+levels only" rows test whether the coarse pressure levels the global AI models output are enough (they are).</p></dd>
+<dt>Sources</dt><dd class="src"><a href="#charts">Scoring conventions</a> · [<a href="factor-guide.html#r-D22">D22</a>] · [<a href="factor-guide.html#r-H20">H20</a>]</dd>
+</dl></div>
+
+<div class="card" id="fc-coarse"><h2>Coarse levels and forecast <span class="where">Forecasting</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>PFT computed from only the standard pressure levels the AI ensembles provide (1000, 925, 850, 700, 600,
+500, 400, 300 and 250 hPa) against the full HRRR column, and the morning forecast against the analysis.</p></dd>
+<dt>How to read it</dt><dd><p>Points on the diagonal mean the coarse levels lose nothing, so PFT could in principle be computed from
+the global AI ensembles days ahead.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-D22">D22</a>] · [<a href="factor-guide.html#r-TK21">TK21</a>] · <a href="https://bah7-humboldt.github.io/ca-ai-ensemble-research/">AI ensemble research viewer</a></dd>
+</dl></div>
+
+<!-- ======================================================== satellite -->
+<h2 style="margin-top:28px" id="sec-satellite">Satellite</h2>
+
+<div class="card" id="sa-panels"><h2>GOES cloud-top review strips <span class="where">Satellite, day detail</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Four GOES band-13 cloud-top temperature scans around the day's coldest fire-rooted top, with the −20 °C
+and −40 °C contours and the past hour's fire pixels: the evidence behind each day's class.</p></dd>
+<dt>How it's made</dt><dd><p>ABI band 13 (10.3 µm) brightness temperature [<a href="#r-SC17">SC17</a>]; fire pixels from the ABI Fire
+Detection and Characterization product [<a href="factor-guide.html#r-S20">S20</a>]. GOES-16 for 2018, GOES-17 for 2019–2022, GOES-18 from
+2023.</p></dd>
+<dt>How to read it</dt><dd><p>The full reading guide, with what to look for in each class and the parallax shift of tall clouds, is at the
+top of the <a href="satellite.html">Satellite page</a>.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-SC17">SC17</a>] · [<a href="factor-guide.html#r-S20">S20</a>] · [<a href="#r-P17">P17</a>] · [<a href="factor-guide.html#r-P18">P18</a>]</dd>
+</dl></div>
+
+<!-- ======================================================== radar -->
+<h2 style="margin-top:28px" id="sec-radar">Radar</h2>
+
+<div class="card" id="ra-strip"><h2>Radar plume column by class <span class="where">Radar</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The tallest echo column rooted on the fire each day (the second-highest scan, to drop one-off spikes), by
+plume class, with the 10.8 km cut.</p></dd>
+<dt>How it's made</dt><dd><p>NEXRAD Level II [<a href="#r-CA93">CA93</a>]: starting from echo at the lowest beam over the fire, climbing
+through echoes with no large vertical gaps. Debris is low-ρ<sub>hv</sub> echo; ice on top is high-ρ<sub>hv</sub>
+[<a href="factor-guide.html#r-M08">M08</a>; <a href="factor-guide.html#r-K13">K13</a>; <a href="factor-guide.html#r-P22">P22</a>;
+<a href="factor-guide.html#r-L22">L22</a>]. Radars whose beams hit Sierra terrain clutter on ordinary days (KHNX, KDAX, KBBX for Ranch) are
+left out.</p></dd>
+<dt>How to read it</dt><dd><p>A 10.8 km column was the clearest single sign of a pyroCb in the study. It is an observation, not a
+forecast.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-CA93">CA93</a>] · [<a href="factor-guide.html#r-M08">M08</a>] · [<a href="factor-guide.html#r-K13">K13</a>] · [<a href="factor-guide.html#r-P22">P22</a>] · [<a href="factor-guide.html#r-L22">L22</a>] · in depth: <a href="factor-guide.html#g-radar_rooted_top_km">radar plume top</a></dd>
+</dl></div>
+
+<div class="card" id="ra-pictures"><h2>Radar pictures of each fire <span class="where">Radar</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>One NEXRAD volume per case, usually the scan with the day's tallest fire-rooted column, in four panels, plus
+a time–height chart of the column through the afternoon.</p></dd>
+<dt>The panels</dt><dd><p><b>a</b> Highest reflectivity in each column through all tilts, with the final perimeter and the past hour's
+GOES fire pixels. <b>b</b> Echo top, the highest gate of 5 dBZ or more (km above sea level). <b>c, d</b> Reflectivity and correlation
+coefficient (CC, ρ<sub>hv</sub>) in a vertical slice along the beam through the fire, every tilt.</p></dd>
+<dt>How to read it</dt><dd><p>In the slices, plume ash and debris read CC below about 0.8 and rain or ice above about 0.95. A pyroCb shows a
+low-CC column rising from the fire capped by high-CC ice; a pyroCu stops lower; a wind-driven run lies flat downwind. Beam heights
+use the standard 4/3-earth model, so beams rise with range.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-CA93">CA93</a>] · [<a href="factor-guide.html#r-K13">K13</a>] · [<a href="factor-guide.html#r-M08">M08</a>] · [<a href="factor-guide.html#r-P22">P22</a>] · [<a href="#r-RZ19">RZ19</a>] · decoding: MetPy [<a href="factor-guide.html#r-M">M</a>]</dd>
+</dl></div>
+
+<div class="card" id="ra-kin"><h2>Downdrafts, outflow and rotation <span class="where">Radar</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>How often three Doppler-velocity hazard signatures appeared over the fire, by class, and how well each
+separates pyroCb days.</p></dd>
+<dt>How it's made</dt><dd><p>Radial velocity every 20 minutes, 13:00–21:00 PDT, within 15 km of the fire. <b>Rotation</b>: half the
+velocity difference across an inbound–outbound couplet about 3 km wide (V<sub>rot</sub>); 10, 15 and 20 m/s are the NWS weak, moderate
+and strong guide values [<a href="#r-BW07">BW07</a>]. <b>Low-level outflow</b>: divergence along the beam within 2 km of the ground of
+0.0025 s<sup>−1</sup> or more, the microburst criterion of Wilson et al. (1984) and Roberts &amp; Wilson (1989) as used by Gibson &amp; Carlin
+(2025) [<a href="#r-W84">W84</a>; <a href="#r-RW89">RW89</a>; <a href="#r-GC25">GC25</a>]. <b>Mid-level convergence</b>: the same
+threshold 3–7 km up, the inflow that often precedes a downburst. Velocity differences are folded back into ± the Nyquist velocity; a
+signature must hold across a 3 × 3 patch of echo gates whose beam clears the ground by 300 m.</p></dd>
+<dt>Limits</dt><dd><p>Beyond about 100 km the beam overshoots shallow outflow; no dealiasing; no storm tracking.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-BW07">BW07</a>] · [<a href="#r-W84">W84</a>] · [<a href="#r-RW89">RW89</a>] · [<a href="#r-GC25">GC25</a>] · [<a href="#r-CA93">CA93</a>]</dd>
+</dl></div>
+
+<div class="card" id="ra-hazards"><h2>Firefighter hazards: precursors and correlations <span class="where">Radar</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The polarimetric downburst precursors searched on every pyroCb and pyroCu day with a radar within 100 km,
+how often each appeared, and the rank correlations of the hazard signatures with the forecast factors.</p></dd>
+<dt>How it's made</dt><dd><p>Gibson &amp; Carlin's (2025) height-bin method on precipitation gates only: 95th-percentile reflectivity and
+K<sub>DP</sub>, and median Z<sub>DR</sub> and 10th-percentile ρ<sub>hv</sub> in the reflectivity core, every scan for 90 minutes either side
+of the tallest plume [<a href="#r-GC25">GC25</a>]. The physics of the signatures follows Carlin &amp; Ryzhkov (2025) and Kumjian (2013)
+[<a href="#r-CR25">CR25</a>; <a href="factor-guide.html#r-K13">K13</a>]. Correlations are Spearman's ρ [<a href="#r-SP04">SP04</a>].</p></dd>
+<dt>More</dt><dd><p><a href="radar.html#percentiles">Why the percentiles</a> · <a href="radar.html#zdr-rho">Z<sub>DR</sub> trough and
+ρ<sub>hv</sub> drop</a> · <a href="safety.html#read-th">reading the time–height pictures</a> · the charts on
+<a href="safety.html#signatures">Firefighter safety</a>.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-GC25">GC25</a>] · [<a href="#r-CR25">CR25</a>] · [<a href="factor-guide.html#r-K13">K13</a>] · [<a href="#r-RZ19">RZ19</a>] · [<a href="#r-SP04">SP04</a>]</dd>
+</dl></div>
+
+<!-- ======================================================== safety -->
+<h2 style="margin-top:28px" id="sec-safety">Firefighter safety</h2>
+
+<div class="card" id="sf-chain"><h2>The hazard chain <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The sequence from dry fuel to a ground hazard under a pyroCb, and the indicator for each link.</p></dd>
+<dt>Background</dt><dd><p>A convective column draws air in at its base and, when it collapses or its precipitation evaporates,
+drives air down and out: the indraft and downdraft hazards described for plume-dominated fires by Rothermel (1991) and in the extreme
+fire behaviour synthesis [<a href="factor-guide.html#r-R91">R91</a>; <a href="#r-W11">W11</a>]. Evaporation-driven downdrafts and the
+outflow they produce are the microburst process documented with Doppler radar [<a href="#r-W84">W84</a>; <a href="#r-RW89">RW89</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-R91">R91</a>] · [<a href="#r-W11">W11</a>] · [<a href="#r-W84">W84</a>] · [<a href="#r-RW89">RW89</a>] · [<a href="factor-guide.html#r-TK21">TK21</a>]</dd>
+</dl></div>
+
+<div class="card" id="sf-triggers"><h2>PyroCb triggers and DCAPE by class <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Strip charts of FP/PFT, PCAPE and DCAPE for every fire day by plume class, with each one's best cut and
+held-out score.</p></dd>
+<dt>How to read it</dt><dd><p>FP/PFT and PCAPE decide whether a pyroCb forms; DCAPE separates poorly as a pyroCb test, which is
+expected: it describes what the downdrafts can do once there is a storm, not whether there will be one. See
+<a href="#charts">strip charts</a>.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-TK21">TK21</a>] · DCAPE [<a href="factor-guide.html#r-GW98">GW98</a>; <a href="factor-guide.html#r-E94">E94</a>] · HRRR [<a href="factor-guide.html#r-D22">D22</a>] · in depth: <a href="factor-guide.html#g-ratio_max">FP ÷ PFT</a>, <a href="factor-guide.html#g-pcape_max_jkg">PCAPE</a>, <a href="factor-guide.html#g-dcape_max_jkg">DCAPE</a></dd>
+</dl></div>
+
+<div class="card" id="sf-heatmap"><h2>Which factor tracks which hazard <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Spearman rank correlation of each radar hazard signature with each forecast factor on pyroCb and pyroCu
+days. Blue = a stronger signature with a higher factor value, red = with a lower value, grey = no relationship; a box marks p &lt; 0.05.</p></dd>
+<dt>How it's made</dt><dd><p>Signatures from the radar kinematics and polarimetric searches (<a href="#ra-kin">kinematics</a>,
+<a href="#ra-hazards">precursors</a>); factors from HRRR (DCAPE, PCAPE, z<sub>fc</sub>, q<sub>ML</sub>) and GOES (fire power). Low-level and core
+signatures use only radars within 100 km; convergence and rotation every range. Core Z<sub>DR</sub> is sign-flipped, since lower is stronger.</p></dd>
+<dt>How to read it</dt><dd><p>Read across a row for the factor that best tracks that hazard. DCAPE's column is the one that lights up
+for the ground hazards; PCAPE and q<sub>ML</sub> light up for the precipitation core instead. Shade bands are 0.15 wide.</p></dd>
+<dt>Limits</dt><dd><p>Seven signatures × five factors = 35 tests: one or two could reach p &lt; 0.05 by chance. Trust patterns that agree
+across rows (DCAPE with outflow, convergence and rotation) more than any single box.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-SP04">SP04</a>] · [<a href="#r-GC25">GC25</a>] · [<a href="factor-guide.html#r-GW98">GW98</a>] · [<a href="factor-guide.html#r-TK21">TK21</a>] · palette: blue–red diverging with neutral grey midpoint</dd>
+</dl></div>
+
+<div class="card" id="sf-outflow"><h2>DCAPE and the outflow at the ground <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Low-level outflow (radar divergence, 10<sup>−3</sup> s<sup>−1</sup>) against the day's peak DCAPE, the share of
+days reaching the downburst threshold above and below DCAPE 1,235 J/kg, and the median outflow in each band.</p></dd>
+<dt>How it's made</dt><dd><p>DCAPE: the energy a parcel from the lowest-θ<sub>e</sub> air in the lowest 400 hPa gains descending
+moist-adiabatically to the ground, from HRRR soundings at the hot front, computed with MetPy
+[<a href="factor-guide.html#r-GW98">GW98</a>; <a href="factor-guide.html#r-E94">E94</a>; <a href="factor-guide.html#r-M">M</a>]. Outflow threshold
+0.0025 s<sup>−1</sup> [<a href="#r-W84">W84</a>; <a href="#r-GC25">GC25</a>]. The 1,235 J/kg split is the best split on these days.</p></dd>
+<dt>How to read it</dt><dd><p>Dots to the right of the vertical line and above the horizontal one are high-DCAPE days with
+downburst-strength outflow; they dominate. High DCAPE means dry air under the cloud base that the precipitation can chill by
+evaporation, so the downdraft accelerates all the way down.</p></dd>
+<dt>Limits</dt><dd><p>25 days. DCAPE assumes a saturated downdraft. Two low-DCAPE outflow days came during strong offshore wind, which
+can make divergence of its own.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-GW98">GW98</a>] · [<a href="factor-guide.html#r-E94">E94</a>] · [<a href="#r-W84">W84</a>] · [<a href="#r-GC25">GC25</a>] · [<a href="factor-guide.html#r-M">M</a>] · [<a href="factor-guide.html#r-D22">D22</a>]</dd>
+</dl></div>
+
+<div class="card" id="sf-convrot"><h2>DCAPE, inflow and rotation <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Mid-level convergence and rotation (V<sub>rot</sub>) against DCAPE, every radar range.</p></dd>
+<dt>How to read it</dt><dd><p>Mid-level convergence draws dry environmental air into the core, where evaporation chills it; Gibson &amp;
+Carlin found it before 83% of the downbursts they studied, making it the most consistent precursor [<a href="#r-GC25">GC25</a>]. Rotation
+values of 10 m/s and more are the NWS "weak" guide value [<a href="#r-BW07">BW07</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-GC25">GC25</a>] · [<a href="#r-BW07">BW07</a>] · [<a href="factor-guide.html#r-GW98">GW98</a>]</dd>
+</dl></div>
+
+<div class="card" id="sf-core"><h2>The precipitation core doubles the outflow <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Outflow and mid-level convergence on days with a precipitation core over the fire against days without,
+radar within 100 km; the bar is each group's median, the dashed line the 0.0025 s<sup>−1</sup> threshold.</p></dd>
+<dt>How it's made</dt><dd><p>A core is at least 10 precipitation gates (30 dBZ or more, ρ<sub>hv</sub> ≥ 0.90, Z<sub>DR</sub> −2 to 8 dB) in a
+height bin over the fire in any scan [<a href="#r-GC25">GC25</a>].</p></dd>
+<dt>How to read it</dt><dd><p>Without precipitation there is nothing to evaporate and little to load the downdraft, so the core is the
+hinge between "pyroCb" and "downburst". The water loading and melting that drive the downdraft are modelled in Carlin &amp; Ryzhkov
+(2025) [<a href="#r-CR25">CR25</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-GC25">GC25</a>] · [<a href="#r-CR25">CR25</a>] · [<a href="factor-guide.html#r-K13">K13</a>]</dd>
+</dl></div>
+
+<div class="card" id="sf-pcape"><h2>PCAPE and z<sub>fc</sub> set the core, not the outflow <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Four small scatters: the strongest core (95th-percentile reflectivity) and the outflow, each against PCAPE
+and against the free-convection height z<sub>fc</sub>.</p></dd>
+<dt>How to read it</dt><dd><p>More pyroconvective energy and a lower z<sub>fc</sub> go with heavier cores: a stronger, deeper updraft grows
+more precipitation. They do not go with the outflow at the ground, which depends on how dry the air under the core is (DCAPE). Compare
+the top pair with the bottom pair.</p></dd>
+<dt>Sources</dt><dd class="src">PCAPE: this study's pyroCb parcel [<a href="factor-guide.html#r-TK21">TK21</a>; <a href="factor-guide.html#r-E94">E94</a>] · [<a href="#r-GC25">GC25</a>] · in depth: <a href="factor-guide.html#g-pcape_max_jkg">PCAPE</a>, <a href="factor-guide.html#g-z_fc_km">z<sub>fc</sub></a></dd>
+</dl></div>
+
+<div class="card" id="sf-explore"><h2>Explore any pair <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>Any hazard signature against any factor, with its rank correlation. Clicking a heatmap cell opens that pair here.</p></dd>
+<dt>Sources</dt><dd class="src">As the <a href="#sf-heatmap">heatmap</a></dd>
+</dl></div>
+
+<div class="card" id="sf-precursors"><h2>How often each precursor appeared <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>For pyroCb and pyroCu days with a radar within 100 km: the share with a precipitation core, a descending
+K<sub>DP</sub> core, a descending reflectivity core, a Z<sub>DR</sub> trough and a ρ<sub>hv</sub> drop.</p></dd>
+<dt>How to read it</dt><dd><p>A precursor is useful when the orange bar is long and the blue one short. The descending K<sub>DP</sub> core
+is the one that does that here. Gibson &amp; Carlin found DRCs in 83%, descending K<sub>DP</sub> cores in 85% and Z<sub>DR</sub> troughs with
+ρ<sub>hv</sub> drops in 89% of 53 U.S. downbursts [<a href="#r-GC25">GC25</a>].</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="#r-GC25">GC25</a>] · [<a href="#r-CR25">CR25</a>] · definitions: <a href="radar.html#zdr-rho">Z<sub>DR</sub> trough and ρ<sub>hv</sub> drop</a>, <a href="radar.html#percentiles">percentiles</a></dd>
+</dl></div>
+
+<div class="card" id="sf-brief"><h2>For the morning brief <span class="where">Firefighter safety</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The study's indicators in the order a forecaster meets them: fuels, then the pyroCb forecast, then
+downdraft energy, then what to watch on radar during the shift. Numbers are read live from the scored tables.</p></dd>
+<dt>Limits</dt><dd><p>Best cuts on a small sample, not validated warning criteria. Use them to raise awareness and to watch the radar,
+not as a go/no-go. Official products: NWS fire weather forecasts and Predictive Services outlooks.</p></dd>
+<dt>Sources</dt><dd class="src">Each row links its source page · [<a href="factor-guide.html#r-TK21">TK21</a>] · [<a href="#r-GC25">GC25</a>]</dd>
+</dl></div>
+
+<!-- ======================================================== soundings -->
+<h2 style="margin-top:28px" id="sec-soundings">Soundings</h2>
+<div class="card" id="so"><h2>Skew-T soundings <span class="where">Soundings, Fires, day detail</span></h2>
+<dl class="gd">
+<dt>What it shows</dt><dd><p>The HRRR sounding at the day's hot front: temperature, dewpoint, the mixed layer, the saturation-point
+curve, the pyroCb parcel from z<sub>fc</sub> to its equilibrium level, the DCAPE downdraft path, and a box with the PFT ingredients.</p></dd>
+<dt>Guide</dt><dd><p>Fully explained in the <a href="sounding-guide.html">Sounding guide</a>: <a href="sounding-guide.html#single">a single day</a>,
+<a href="sounding-guide.html#examples">the example soundings by plume class</a>.</p></dd>
+<dt>Sources</dt><dd class="src">[<a href="factor-guide.html#r-TK21">TK21</a>] · [<a href="factor-guide.html#r-D22">D22</a>] · [<a href="factor-guide.html#r-GW98">GW98</a>] · [<a href="factor-guide.html#r-M">M</a>]</dd>
+</dl></div>
+
+<!-- ======================================================== references -->
+<div class="card" id="refs"><h2>References</h2>
+<p class="note">Entries marked in the panels with a link into the <a href="factor-guide.html#refs">Factor guide's list</a> (for example
+TK21, D22, H20, K13) are listed in full there. The rest are here.</p>
+<ul class="reflist">
+<li id="r-B10">[B10] Brodersen, K. H., C. S. Ong, K. E. Stephan and J. M. Buhmann, 2010: The balanced accuracy and its posterior
+distribution. <i>Proceedings of the 20th International Conference on Pattern Recognition</i>, 3121–3124. <a href="https://doi.org/10.1109/ICPR.2010.764">doi:10.1109/ICPR.2010.764</a></li>
+<li id="r-BW07">[BW07] Brown, R. A., and V. T. Wood, 2007: <i>A Guide for Interpreting Doppler Velocity Patterns: Northern Hemisphere
+Edition</i>, 2nd ed. NOAA/National Severe Storms Laboratory.</li>
+<li id="r-CA93">[CA93] Crum, T. D., and R. L. Alberty, 1993: The WSR-88D and the WSR-88D Operational Support Facility. <i>Bulletin of
+the American Meteorological Society</i>, 74, 1669–1687. <a href="https://doi.org/10.1175/1520-0477(1993)074%3C1669:TWATWO%3E2.0.CO;2">doi:10.1175/1520-0477(1993)074&lt;1669:TWATWO&gt;2.0.CO;2</a></li>
+<li id="r-CD85">[CD85] Cohen, J. D., and J. E. Deeming, 1985: The National Fire-Danger Rating System: basic equations. USDA Forest
+Service General Technical Report PSW-82.</li>
+<li id="r-CEFA">[CEFA] Desert Research Institute, Program for Climate, Ecosystem and Fire Applications: GACC Critical Fire Thresholds
+(Northern and Southern California). <a href="https://cefa.dri.edu/CriticalFire/home.php">cefa.dri.edu/CriticalFire</a></li>
+<li id="r-CR25">[CR25] Carlin, J. T., and A. V. Ryzhkov, 2025: What can polarimetric radar signatures of developing downbursts reveal
+about their intensity? <i>Journal of the Atmospheric Sciences</i>. <a href="https://doi.org/10.1175/JAS-D-25-0014.1">doi:10.1175/JAS-D-25-0014.1</a></li>
+<li id="r-D09">[D09] Davies, D. K., S. Ilavajhala, M. M. Wong and C. O. Justice, 2009: Fire Information for Resource Management System:
+archiving and distributing MODIS active fire data. <i>IEEE Transactions on Geoscience and Remote Sensing</i>, 47, 72–79.
+<a href="https://doi.org/10.1109/TGRS.2008.2002076">doi:10.1109/TGRS.2008.2002076</a></li>
+<li id="r-GC25">[GC25] Gibson, M. N., and J. T. Carlin, 2025: Analysis of polarimetric radar downburst precursors using automated
+storm identification and tracking. <i>Weather and Forecasting</i>. <a href="https://doi.org/10.1175/WAF-D-24-0222.1">doi:10.1175/WAF-D-24-0222.1</a></li>
+<li id="r-J05">[J05] Jolly, W. M., R. Nemani and S. W. Running, 2005: A generalized, bioclimatic index to predict foliar phenology in
+response to climate. <i>Global Change Biology</i>, 11, 619–632. <a href="https://doi.org/10.1111/j.1365-2486.2005.00930.x">doi:10.1111/j.1365-2486.2005.00930.x</a></li>
+<li id="r-K96">[K96] Kalnay, E., and co-authors, 1996: The NCEP/NCAR 40-year reanalysis project. <i>Bulletin of the American
+Meteorological Society</i>, 77, 437–471. <a href="https://doi.org/10.1175/1520-0477(1996)077%3C0437:TNYRP%3E2.0.CO;2">doi:10.1175/1520-0477(1996)077&lt;0437:TNYRP&gt;2.0.CO;2</a></li>
+<li id="r-NE">[NE] Natural Earth: free vector and raster map data (public domain). <a href="https://www.naturalearthdata.com/">naturalearthdata.com</a></li>
+<li id="r-NWS99">[NWS99] National Weather Service, 1999: <i>Critical Fire Weather Patterns of the United States</i>. Compiled for the NWS
+Fire Weather Forecasters Course, Boise, Idaho.</li>
+<li id="r-P17">[P17] Peterson, D. A., and co-authors, 2017: Detection and inventory of intense pyroconvection in western North America
+using GOES-15 daytime infrared data. <i>Journal of Applied Meteorology and Climatology</i>, 56, 471–493.
+<a href="https://doi.org/10.1175/JAMC-D-16-0226.1">doi:10.1175/JAMC-D-16-0226.1</a></li>
+<li id="r-P14">[P14] Parks, S. A., 2014: Mapping day-of-burning with coarse-resolution satellite fire-detection data.
+<i>International Journal of Wildland Fire</i>, 23, 215–223. <a href="https://doi.org/10.1071/WF13138">doi:10.1071/WF13138</a></li>
+<li id="r-PM21">[PM21] Potter, B. E., and D. McEvoy, 2021: Weather factors associated with extremely large fires and fire growth days.
+<i>Earth Interactions</i>, 25, 160–176. <a href="https://doi.org/10.1175/EI-D-21-0008.1">doi:10.1175/EI-D-21-0008.1</a></li>
+<li id="r-PMS437">[PMS437] National Wildfire Coordinating Group: <i>Fire Behavior Field Reference Guide</i>, PMS 437, Critical Fire
+Weather. <a href="https://www.nwcg.gov/publications/pms437/weather/critical-fire-weather">nwcg.gov/publications/pms437</a></li>
+<li id="r-RW89">[RW89] Roberts, R. D., and J. W. Wilson, 1989: A proposed microburst nowcasting procedure using single-Doppler radar.
+<i>Journal of Applied Meteorology</i>, 28, 285–303. <a href="https://doi.org/10.1175/1520-0450(1989)028%3C0285:APMNPU%3E2.0.CO;2">doi:10.1175/1520-0450(1989)028&lt;0285:APMNPU&gt;2.0.CO;2</a></li>
+<li id="r-RZ19">[RZ19] Ryzhkov, A. V., and D. S. Zrnić, 2019: <i>Radar Polarimetry for Weather Observations</i>. Springer Atmospheric
+Sciences, Springer, Cham.</li>
+<li id="r-S64">[S64] Schroeder, M. J., and co-authors, 1964: <i>Synoptic Weather Types Associated with Critical Fire Weather</i>. USDA
+Forest Service, Pacific Southwest Forest and Range Experiment Station, Berkeley, California.</li>
+<li id="r-SC17">[SC17] Schmit, T. J., P. Griffith, M. M. Gunshor, J. M. Daniels, S. J. Goodman and W. J. Lebair, 2017: A closer look at
+the ABI on the GOES-R series. <i>Bulletin of the American Meteorological Society</i>, 98, 681–698.
+<a href="https://doi.org/10.1175/BAMS-D-15-00230.1">doi:10.1175/BAMS-D-15-00230.1</a></li>
+<li id="r-SH22">[SH22] Short, K. C., 2022: Spatial wildfire occurrence data for the United States, 1992–2020 [FPA_FOD_20221014], 6th
+ed. Forest Service Research Data Archive, Fort Collins, Colorado. <a href="https://doi.org/10.2737/RDS-2013-0009.6">doi:10.2737/RDS-2013-0009.6</a></li>
+<li id="r-SP04">[SP04] Spearman, C., 1904: The proof and measurement of association between two things. <i>American Journal of
+Psychology</i>, 15, 72–101. <a href="https://doi.org/10.2307/1412159">doi:10.2307/1412159</a></li>
+<li id="r-W11">[W11] Werth, P. A., and co-authors, 2011: <i>Synthesis of Knowledge of Extreme Fire Behavior: Volume I for Fire
+Managers</i>. USDA Forest Service General Technical Report PNW-GTR-854.</li>
+<li id="r-W84">[W84] Wilson, J. W., R. D. Roberts, C. Kessinger and J. McCarthy, 1984: Microburst wind structure and evaluation of
+Doppler radar for airport wind shear detection. <i>Journal of Climate and Applied Meteorology</i>, 23, 898–915.</li>
+<li id="r-WFIGS">[WFIGS] National Interagency Fire Center, Wildland Fire Interagency Geospatial Services: interagency fire perimeters.
+<a href="https://data-nifc.opendata.arcgis.com/">NIFC Open Data</a></li>
+<li id="r-Z03">[Z03] Zachariassen, J., K. F. Zeller, N. Nikolov and T. McClelland, 2003: A review of the Forest Service Remote Automated
+Weather Station (RAWS) network. USDA Forest Service General Technical Report RMRS-GTR-119.</li>
+</ul>
+<p class="note">Data products: GOES-16/17/18/19 ABI and NEXRAD Level II (NOAA Open Data Dissemination on AWS), HRRR (NOAA, via AWS),
+ERA5 (Copernicus Climate Change Service), NCEP/NCAR Reanalysis 1 (NOAA PSL), NASA FIRMS VIIRS/MODIS, MTBS, LANDFIRE, gridMET,
+FEMS RAWS and NFMD, Vaisala NLDN (strike counts only). Credits and licences: <a href="methods.html#credits">Methods &amp; sources</a>.</p>
+</div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("guide.html");
+// contents built from the section headings and panel cards
+const toc = document.getElementById("toc"); let html = "";
+document.querySelectorAll('h2[id^="sec-"], .card[id]').forEach(e => {
+  if (e.tagName === "H2") html += `<h3>${e.textContent}</h3>`;
+  else if (!["refs"].includes(e.id) && e.closest(".wrap") && e.id !== "toc") {
+    const h = e.querySelector("h2"); if (h) html += `<a href="#${e.id}">${h.childNodes[0].textContent.trim()}</a>`;
+  }
+});
+toc.innerHTML = html + `<h3>References</h3><a href="#refs">All sources</a>`;
+// back link on every panel entry to the page it explains
+const BACK = { idx: "index.html", ex: "explore.html", fa: "factors.html", fi: "fires.html", pa: "patterns.html", fc: "forecast.html",
+  sa: "satellite.html", ra: "radar.html", sf: "safety.html", so: "soundings.html" };
+document.querySelectorAll(".card[id]").forEach(c => {
+  const p = BACK[c.id.split("-")[0]]; if (p) c.insertAdjacentHTML("beforeend", `<p class="back"><a href="${p}">← back to the page</a></p>`);
+});
+</script></body></html>

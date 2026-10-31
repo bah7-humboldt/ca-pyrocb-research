@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soundings · PyroCb Research</title>
+<meta name="description" content="HRRR skew-T soundings at the fire front for pyroCb, pyroCu and no-deep-cloud days on 23 California fires, with how to read them.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Soundings: the air over the fire</h1>
+<p class="sub">A sounding is a vertical profile of the atmosphere. These come from the HRRR model's hourly analysis at the
+fire's most active front, at the hour the fire came closest to its pyroCb threshold (highest FP/PFT; otherwise the hour
+of lowest PFT). They show why the same fire could make a pyroCb one afternoon and only smoke the next.
+<a href="sounding-guide.html">How the soundings are made →</a></p>
+
+<div data-guide="sounding-guide.html#single" class="card"><h2>How to read them</h2>
+<div class="grid2">
+<div>
+<h3>The chart</h3>
+<p>Height runs up the page as pressure (hPa, surface to 100 hPa). Temperature runs along the bottom, but the lines of equal
+temperature lean up and to the right at 45° (a "skew-T"), so the profiles stand up instead of falling off the chart.</p>
+<ul>
+<li><b style="color:#d62728">Red</b>: air temperature. <b style="color:#1f5fd1">Blue</b>: dewpoint. Where they come close, the air is nearly saturated.</li>
+<li><b style="color:#7b2d8e">Purple</b>: the mixed layer, the deep, well-stirred layer the fire's heat goes into: its temperature
+(solid, following a dry adiabat) and moisture (dotted), meeting at its cloud base (the dot, "ML-LCL").</li>
+<li><b style="color:#1b2a7a">Navy</b>: the saturation-point curve: where a plume cloud would form if the fire adds more and more
+heat (each 15 K of extra warmth comes with about 1 g/kg of extra moisture from burning).</li>
+<li><b style="color:#8b4513">Brown</b>: the pyroCb parcel. It rises dry (dashed) to the <b>star, z<sub>fc</sub></b>, the
+lowest point on the navy curve from which it stays warmer than the air all the way to −20 °C, then follows the solid brown
+line up to where it stops being buoyant (the parcel EL line).</li>
+<li><b style="color:#2e8b57">Green dash-dot</b>: the downdraft parcel behind <b>DCAPE</b>. It starts in the driest air of the
+lowest 400 hPa and sinks to the ground, kept saturated by evaporating rain or ice.</li>
+<li>Dashed lines mark the cloud base, z<sub>fc</sub>, the parcel's equilibrium level and the −20 °C level. Wind barbs are on the right.</li>
+</ul>
+</div>
+<div>
+<h3>The box</h3>
+<ul>
+<li><b>PFT</b>: the least fire power (GW) that can push a plume to z<sub>fc</sub> against the wind and still have it
+convect, from z<sub>fc</sub>, the extra warmth needed (Δθ<sub>fc</sub>) and the mixed-layer wind (U<sub>ML</sub>).
+"No pyroCb solution" means no amount of fire power gets there.</li>
+<li><b>PCAPE</b>: the parcel's buoyant energy above z<sub>fc</sub> (J/kg), the area between the brown line and the red one.</li>
+<li><b>DCAPE</b>: how much energy that sinking parcel gains on the way down (J/kg), the area between the green line and the red
+one. More DCAPE means stronger possible downdrafts and gusty outflow at the fire.</li>
+<li>Then the mixed layer's moisture and depth, and what the fire did that day: FP/PFT, peak fire power, the coldest cloud
+top GOES saw rising from the fire, and the growth.</li>
+</ul>
+<h3>What to look for</h3>
+<ul>
+<li><b>PyroCb days</b>: moist air aloft (blue close to red around 500–300 hPa, often monsoon moisture), a mixed layer that
+reaches its cloud base, a low star and a low PFT that the fire's power could match.</li>
+<li><b>No-deep-cloud days</b>: very dry air (blue far to the left), a deep hot mixed layer whose cloud base sits too high,
+and often no pyroCb solution at all, even on the biggest wind-driven runs.</li>
+</ul>
+</div>
+</div></div>
+
+<div data-guide="sounding-guide.html#single" class="card"><h2>Browse and compare</h2>
+<p class="note">Each fire shows every pyroCb day, its two biggest pyroCu days and its two biggest days with
+<a href="methods.html#classes">no deep plume cloud</a>. Pick a second day to see them side by side. Click a chart to enlarge it.</p>
+<div id="browser"></div>
+</div>
+
+<div data-guide="sounding-guide.html#examples" class="card" id="avgcard"><h2 id="avgtitle">Example soundings by plume class</h2>
+<p class="note">Three single days side by side, not averages: the fire's first pyroCb day, its biggest pyroCu day and its
+biggest day with no deep plume cloud.</p>
+<img id="avgimg" alt="" loading="lazy" style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff;cursor:zoom-in"></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("soundings.html");
+const items = PYRO.days.filter(d => d.sounding_img).sort((a, b) => a.fire < b.fire ? -1 : a.fire > b.fire ? 1 : a.day < b.day ? -1 : 1);
+const lb = PG.lightbox(), f = PC.fmt;
+PG.browser(document.getElementById("browser"), {
+  items, featured: d => d.cls === "pyroCb", featuredLabel: "PyroCb days, all fires",
+  pane: d => `<h3>${PG.fireLabel(d.fire)} · ${d.day} <span class="badge ${d.cls}">${PC.CLS_NAME[d.cls]}</span></h3>
+    <p class="note">PFT ${PG.pft(d)} · FP/PFT ${f(d.ratio_max, 2)} · PCAPE ${f(d.pcape_max_jkg, 0)} J/kg · DCAPE ${f(d.dcape_max_jkg, 0)} J/kg (day max) · growth ${f(d.growth_ac, 0)} ac</p>
+    <img src="${d.sounding_img}" alt="Skew-T sounding for ${PG.fireLabel(d.fire)} on ${d.day}" loading="lazy"
+      style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">
+    <p class="note"><a href="explore.html?x=pft_min_gw&y=fp_max_gw&day=${d.id}">This day's numbers →</a> ·
+      <a href="satellite.html?case=${d.id}">satellite</a> · <a href="radar.html?case=${d.id}">radar</a></p>`,
+  onSelect: a => {
+    const fr = a && PYRO.fires[a.fire], card = document.getElementById("avgcard");
+    if (!fr || !fr.compare_img) { card.style.display = "none"; return; }
+    card.style.display = "";
+    document.getElementById("avgtitle").textContent = `Example soundings by plume class: ${fr.label}`;
+    const im = document.getElementById("avgimg"); im.src = fr.compare_img; im.alt = `Example soundings by plume class, ${fr.label}`;
+  },
+});
+document.getElementById("avgimg").addEventListener("click", e => lb(e.target.src, e.target.alt));
+</script></body></html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore Fire Days · PyroCb Research</title>
+<meta name="description" content="Plot any two pyroCb factors against each other for every fire day, filter by fire and class, and test thresholds live.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Explore fire days</h1>
+<p class="sub">Every studied fire day is a dot. Pick what goes on each axis, filter by fire or plume class, and click a dot
+for that day's details, its satellite cloud-top review and its sounding.</p>
+<div class="card" data-guide="guide.html#ex-scatter">
+  <div class="controls">
+    <label>X <select id="xs"></select></label><label><input type="checkbox" id="xlog"> log</label>
+    <label>Y <select id="ys"></select></label><label><input type="checkbox" id="ylog"> log</label>
+    <label>Preset <select id="preset">
+      <option value="">—</option>
+      <option value="pft_min_gw|fp_max_gw">Fire power vs threshold (the core test)</option>
+      <option value="q700_era5|ratio_max">Mid-level moisture vs FP/PFT</option>
+      <option value="z_fc_km|dtheta_fc">Plume height needed vs extra warmth needed</option>
+      <option value="u_ml|q_ml_gkg">Wind vs moisture in the mixed layer</option>
+      <option value="pft_fc_min|pft_min_gw">Morning forecast vs analysis PFT</option>
+      <option value="pcape_max_jkg|ratio_max">PCAPE vs FP/PFT</option>
+      <option value="pcape_fc_max|pcape_max_jkg">Forecast vs analysis PCAPE</option>
+      <option value="ahead_avail_kgm2|ratio_max">Fuel ahead vs FP/PFT</option>
+      <option value="growth_ac|ratio_max">Growth vs FP/PFT</option>
+    </select></label>
+  </div>
+  <div class="controls"><span class="note">Fires</span><div class="chips" id="fires"></div></div>
+  <div class="controls"><span class="note">Classes</span><div class="chips" id="classes"></div></div>
+  <div class="grid2 wide-left">
+    <div><div class="chart" id="scatter"></div><p class="note" id="axisnote"></p></div>
+    <div class="detail" id="detail"></div>
+  </div>
+</div>
+<div data-guide="guide.html#ex-threshold" class="card" id="threshold"><h2>Threshold tool</h2>
+  <p class="note">Pick a factor and drag the cut. The counts show what a "pyroCb likely" rule at that cut would have flagged.
+  Days with ordinary thunderstorms over the fire are left out, since satellite cloud tops can't tell a pyroCb from them.</p>
+  <div class="controls">
+    <label>Factor <select id="ts"></select></label>
+    <label>pyroCb when <select id="tdir"><option value="1">at or above</option><option value="0">at or below</option></select></label>
+    <button class="chip" id="best" type="button">Best cut</button>
+  </div>
+  <div class="slider"><span id="tlabel"></span><span class="val" id="tval"></span><input type="range" id="tcut" min="0" max="1000" value="500"></div>
+  <div class="grid3 score" id="tscore"></div>
+  <div class="chart" id="tstrip"></div>
+  <p class="note" id="twhat"></p>
+</div>
+<div data-guide="guide.html#ex-table" class="card"><h2>All days (table)</h2><p class="note">Sortable: click a column header.</p>
+  <div class="scroll tall"><table id="tbl"></table></div></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("explore.html");
+const D = PYRO.days, M = PC.M, keys = Object.keys(M);
+const st = { x: "pft_min_gw", y: "fp_max_gw", fires: new Set(Object.keys(PYRO.fires)), cls: new Set(PC.CLS), sel: null };
+const q = new URLSearchParams(location.search);
+if (q.get("x") && M[q.get("x")]) st.x = q.get("x");
+if (q.get("y") && M[q.get("y")]) st.y = q.get("y");
+if (q.get("day") && PG.byId[q.get("day")]) st.sel = q.get("day");
+for (const id of ["xs", "ys", "ts"]) document.getElementById(id).innerHTML = keys.map(k => `<option value="${k}">${M[k].label}</option>`).join("");
+const xs = document.getElementById("xs"), ys = document.getElementById("ys");
+xs.value = st.x; ys.value = st.y;
+document.getElementById("xlog").checked = M[st.x].log; document.getElementById("ylog").checked = M[st.y].log;
+const chip = (host, items, set, label, sw) => {
+  host.innerHTML = items.map(k => `<span class="chip on" data-k="${k}">${sw ? `<i class="sw ${k}"></i>` : ""}${label(k)}</span>`).join("");
+  host.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+    const k = c.dataset.k; set.has(k) ? set.delete(k) : set.add(k); c.classList.toggle("on"); draw();
+  }));
+};
+chip(document.getElementById("fires"), Object.keys(PYRO.fires), st.fires, PG.fireLabel, false);
+chip(document.getElementById("classes"), PC.CLS, st.cls, k => PC.CLS_NAME[k], true);
+function select(p) { st.sel = p.id; PG.detail(document.getElementById("detail"), PG.byId[p.id]); draw(); history.replaceState(null, "", `?x=${st.x}&y=${st.y}&day=${p.id}`); }
+function draw() {
+  const xl = document.getElementById("xlog").checked, yl = document.getElementById("ylog").checked;
+  const pts = D.map(d => ({ id: d.id, cls: d.cls, x: PC.val(d, st.x), y: PC.val(d, st.y), html: PG.dayTip(d),
+    dim: !(st.fires.has(d.fire) && st.cls.has(d.cls)) }));
+  const diag = (st.x === "pft_min_gw" && st.y === "fp_max_gw") ? [{ k: 1, label: "FP = PFT" }, { k: 0.25, label: "FP = 0.25 × PFT", dash: "2 4" }] : null;
+  PC.scatter(document.getElementById("scatter"), { points: pts, xLabel: M[st.x].label, yLabel: M[st.y].label, xLog: xl, yLog: yl,
+    onClick: select, selected: st.sel, diag });
+  const nos = (M[st.x].log && st.x.startsWith("pft")) || (M[st.y].log && st.y.startsWith("pft"));
+  document.getElementById("axisnote").innerHTML = `<b>${M[st.x].short}</b>: ${M[st.x].what}<br><b>${M[st.y].short}</b>: ${M[st.y].what}` +
+    (nos ? `<br>Days with no PFT solution are drawn at 3,000 GW.` : "");
+}
+xs.addEventListener("change", () => { st.x = xs.value; document.getElementById("xlog").checked = M[st.x].log; draw(); });
+ys.addEventListener("change", () => { st.y = ys.value; document.getElementById("ylog").checked = M[st.y].log; draw(); });
+["xlog", "ylog"].forEach(id => document.getElementById(id).addEventListener("change", draw));
+document.getElementById("preset").addEventListener("change", e => { if (!e.target.value) return; const [a, b] = e.target.value.split("|");
+  st.x = a; st.y = b; xs.value = a; ys.value = b; document.getElementById("xlog").checked = M[a].log; document.getElementById("ylog").checked = M[b].log; draw(); });
+PG.detail(document.getElementById("detail"), st.sel ? PG.byId[st.sel] : null);
+draw();
+
+// threshold tool
+const ts = document.getElementById("ts"), tdir = document.getElementById("tdir"), tcut = document.getElementById("tcut");
+ts.value = "ratio_max";
+let vmin, vmax, logT;
+function setupT() {
+  const k = ts.value; tdir.value = M[k].hi ? "1" : "0"; logT = M[k].log;
+  const v = D.map(d => PC.val(d, k)).filter(x => x !== null && x !== 3000 && (!logT || x > 0));
+  vmin = Math.min(...v); vmax = Math.max(...v);
+  const b = PC.bestCut(D, k, M[k].hi); setCut(b ? b.c : (vmin + vmax) / 2);
+  document.getElementById("twhat").textContent = M[k].what;
+}
+const toS = c => logT ? (Math.log10(c) - Math.log10(vmin)) / (Math.log10(vmax) - Math.log10(vmin)) * 1000 : (c - vmin) / (vmax - vmin) * 1000;
+const fromS = s => logT ? Math.pow(10, Math.log10(vmin) + s / 1000 * (Math.log10(vmax) - Math.log10(vmin))) : vmin + s / 1000 * (vmax - vmin);
+function setCut(c) { tcut.value = Math.round(toS(c)); drawT(c); }
+function drawT(c) {
+  const k = ts.value, hi = tdir.value === "1", s = PC.score(D, k, c, hi);
+  document.getElementById("tlabel").textContent = `${M[k].short} cut`;
+  document.getElementById("tval").textContent = PC.fmt(c, M[k].nd + (c < 1 ? 2 : 0)) + (M[k].unit ? " " + M[k].unit : "");
+  document.getElementById("tscore").innerHTML =
+    `<div class="tile"><div class="v">${s.cb}/${s.cbN}</div><div class="l">pyroCb days flagged (want all)</div></div>` +
+    `<div class="tile"><div class="v">${s.cu}/${s.cuN}</div><div class="l">pyroCu days flagged (near misses)</div></div>` +
+    `<div class="tile"><div class="v">${s.no}/${s.noN}</div><div class="l">no-plume days flagged (false alarms)</div></div>`;
+  PC.strip(document.getElementById("tstrip"), { points: D.map(d => ({ v: PC.val(d, k), cls: d.cls, html: PG.dayTip(d), id: d.id })),
+    log: logT, label: M[k].label, cut: c, cutLabel: `${hi ? "≥" : "≤"} ${PC.fmt(c, 2)}`, onClick: p => { select(p); document.getElementById("detail").scrollIntoView({ behavior: "smooth" }); } });
+}
+ts.addEventListener("change", setupT); tdir.addEventListener("change", () => drawT(fromS(+tcut.value)));
+tcut.addEventListener("input", () => drawT(fromS(+tcut.value)));
+document.getElementById("best").addEventListener("click", () => { const b = PC.bestCut(D, ts.value, tdir.value === "1"); if (b) setCut(b.c); });
+setupT();
+
+// table
+const cols = [["fire", "Fire"], ["day", "Day"], ["cls", "Class"], ["regime", "Regime"], ["growth_ac", "Growth (ac)"], ["fp_max_gw", "FP (GW)"],
+  ["pft_min_gw", "PFT (GW)"], ["ratio_max", "FP/PFT"], ["z_fc_km", "z_fc (km)"], ["q_ml_gkg", "q_ML"], ["q700_era5", "q700"],
+  ["u_ml", "U_ML"], ["pcape_max_jkg", "PCAPE"], ["radar_rooted_top_km", "Radar top"], ["pft_fc_min", "Fcst PFT"]];
+let sortK = "day", sortDir = 1;
+function drawTbl() {
+  const rows = D.slice().sort((a, b) => { const va = a[sortK] === "inf" ? 1e9 : a[sortK], vb = b[sortK] === "inf" ? 1e9 : b[sortK];
+    return (va === null) - (vb === null) || (va > vb ? 1 : va < vb ? -1 : 0) * sortDir; });
+  document.getElementById("tbl").innerHTML = `<tr>${cols.map(([k, t]) => `<th class="${["fire", "day", "cls", "regime"].includes(k) ? "" : "n"}" data-k="${k}" style="cursor:pointer">${t}${sortK === k ? (sortDir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr>` +
+    rows.map(d => `<tr data-id="${d.id}" style="cursor:pointer">${cols.map(([k]) => k === "fire" ? `<td>${PG.fireLabel(d.fire)}</td>` : k === "cls" ? `<td><span class="badge ${d.cls}">${PC.CLS_NAME[d.cls]}</span></td>` :
+      ["day", "regime"].includes(k) ? `<td>${d[k] || "–"}</td>` : `<td class="n">${PC.fmt(d[k], k === "growth_ac" ? 0 : undefined)}</td>`).join("")}</tr>`).join("");
+  document.querySelectorAll("#tbl th").forEach(th => th.addEventListener("click", () => { const k = th.dataset.k; sortDir = sortK === k ? -sortDir : 1; sortK = k; drawTbl(); }));
+  document.querySelectorAll("#tbl tr[data-id]").forEach(tr => tr.addEventListener("click", () => { select({ id: tr.dataset.id }); window.scrollTo({ top: 0, behavior: "smooth" }); }));
+}
+drawTbl();
+</script></body></html>

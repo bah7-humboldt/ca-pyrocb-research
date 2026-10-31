@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forecasting PyroCb · PyroCb Research</title>
+<meta name="description" content="What a 5 a.m. HRRR forecast of the pyroCb firepower threshold would have caught on 23 California fires.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Could it have been forecast?</h1>
+<p class="sub">A hindcast: for each fire day, the 12Z (05 PDT) HRRR run's afternoon forecast (f09–f15) at the fire front known that
+morning, as an analyst could have computed it before the burn period.</p>
+<div class="tiles" id="tiles"></div>
+<div data-guide="guide.html#fc-tiers" class="card"><h2>Two tiers</h2>
+  <p><b>Watch</b>: the forecast PFT has a solution and drops to 360 GW or less. <b>Warning</b>: Watch, and yesterday's peak satellite
+  fire power is at least 0.13 of the forecast PFT.</p>
+  <p>The last row is a candidate third screen, tested after the tiers were set: the morning forecast's
+  <b>pyroconvective CAPE</b> (the pyroCb parcel's buoyant energy above z<sub>fc</sub>) of 70 J/kg or more. Held out fire by fire it caught
+  <span id="pcfc">most</span> pyroCb days, among the best forecast measures tested, but several pyroCb days sat close to the cut.</p>
+  <div class="scroll"><table id="tiers"></table></div></div>
+<div data-guide="guide.html#fc-scatter" class="card"><h2>Forecast against analysis PFT</h2><p class="note">Each day's lowest PFT, morning forecast vs the HRRR analysis. Days on the dashed line were forecast exactly.</p>
+  <div id="lg"></div><div class="grid2 wide-left"><div class="chart" id="sc"></div><div class="detail" id="detail"></div></div></div>
+<div data-guide="guide.html#fc-measures" class="card"><h2>All forecast measures</h2><p class="note">Scores with each fire held out.</p>
+  <div class="scroll"><table id="scores"></table></div></div>
+<div data-guide="guide.html#fc-coarse" class="card"><h2>Coarse levels and forecast</h2><p class="note">PFT on the AI ensembles' standard pressure levels matched the full HRRR column.</p>
+  <img src="img/figures/pft_coarse_and_forecast.png" alt="PFT from coarse levels and the morning forecast against the analysis" style="max-width:100%;border-radius:6px" loading="lazy"></div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("forecast.html");
+const D = PYRO.days.filter(d => d.cls !== "ambiguous"), cnt = (f, c) => D.filter(d => d.cls === c && f(d)).length, tot = c => D.filter(d => d.cls === c && d.pft_fc_min !== null).length;
+const watch = d => d.pft_fc_min !== null && d.pft_fc_min !== "inf" && d.pft_fc_min <= 360;
+const warn = d => watch(d) && d.r_prev_goes_fc !== null && d.r_prev_goes_fc !== "inf" && d.r_prev_goes_fc >= 0.13;
+const nosol = d => d.pft_fc_min === "inf";
+document.getElementById("tiles").innerHTML = [[cnt(nosol, "pyroCb") + " / " + D.filter(nosol).length, "pyroCb days among days the forecast said 'no solution'"],
+  [cnt(watch, "pyroCb") + "/" + tot("pyroCb"), "pyroCb days under Watch"], [cnt(warn, "pyroCb") + "/" + tot("pyroCb"), "pyroCb days under Warning"]]
+  .map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("tiers").innerHTML = `<tr><th>Tier</th>${["pyroCb", "pyroCu", "none"].map(c => `<th class="n">${PC.CLS_NAME[c]}</th>`).join("")}</tr>` +
+  [["Warning", warn], ["Watch (incl. Warning)", watch], ["No solution", nosol],
+   ["Forecast PCAPE ≥ 70 J/kg", d => d.pcape_fc_max !== null && d.pcape_fc_max !== undefined && d.pcape_fc_max >= 70]].map(([n, f]) => `<tr><td>${n}</td>${["pyroCb", "pyroCu", "none"].map(c => `<td class="n">${cnt(f, c)}/${tot(c)}</td>`).join("")}</tr>`).join("");
+document.getElementById("lg").innerHTML = PC.legend();
+const PCF = PYRO.scores.forecast.find(s => s.column === "pcape_fc_max");
+if (PCF) document.getElementById("pcfc").textContent = PCF.lofo_hit.replace("/", " of ");
+PG.detail(document.getElementById("detail"), null);
+PC.scatter(document.getElementById("sc"), { points: PYRO.days.map(d => ({ id: d.id, cls: d.cls, x: PC.val(d, "pft_min_gw"), y: PC.val(d, "pft_fc_min"), html: PG.dayTip(d) })),
+  xLabel: "Analysis PFT (GW)", yLabel: "Morning forecast PFT (GW)", xLog: true, yLog: true, diag: [{ k: 1, label: "1:1" }],
+  onClick: p => PG.detail(document.getElementById("detail"), PG.byId[p.id]) });
+document.getElementById("scores").innerHTML = `<tr><th>Measure</th><th class="n">Cut</th><th class="n">PyroCb caught</th><th class="n">Others flagged</th><th class="n">Bal. acc.</th></tr>` +
+  PYRO.scores.forecast.map(s => `<tr><td>${s.measure}</td><td class="n">${PC.fmt(s.pooled_cut)}</td><td class="n">${s.lofo_hit}</td><td class="n">${s.lofo_fa}</td><td class="n">${s.lofo_bal_acc.toFixed(2)}</td></tr>`).join("");
+</script></body></html>
