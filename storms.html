@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storms Over Fires · PyroCb Research</title>
+<meta name="description" content="Review the fire days the satellite could not settle (ordinary thunderstorms over or beside the fire): GOES cloud tops, radar and soundings side by side, with a verdict form for meteorologists.">
+<link rel="stylesheet" href="site.css"></head><body><div class="wrap">
+<h1>Storms over fires: is there a pyroCb in there?</h1>
+<p class="sub">On these days ordinary thunderstorms were over or beside the fire, so the satellite test can't tell a pyroCb
+from the storms around it and every score on this site leaves them out. A trained eye can do better. Each day below has its
+GOES cloud-top panels, the radar column over the fire and the HRRR sounding at the fire front. Look for a tower that starts
+on the fire pixels, grows faster or colder than the storms around it, and keeps a debris-filled (low correlation) column under it.</p>
+
+<div class="card" data-guide="guide.html#st-review"><h2>How to review</h2>
+<ol>
+<li>Pick a day from the list (filters narrow it; "Not yet reviewed" hides the days you have already called).</li>
+<li><b>Satellite panels</b>: is the coldest top rooted on the fire pixels (circled), and did it appear there first, or did a
+  storm drift over the fire? The onset check already flags days with 30+ cold pixels in the hour before the fire's tower.</li>
+<li><b>Radar</b>: a pyroCb column rises from the fire's own echo, with low correlation coefficient (debris, under about 0.8)
+  low down and an ice cap (high CC) aloft. A storm core over the fire has high CC all the way down and no root in the plume.
+  The time-height chart shows when the fire's column grew.</li>
+<li><b>Sounding</b>: could the fire have done it? Moist, unstable air aloft and a low PFT make a pyroCb plausible.</li>
+<li>Record your call. Calls are kept in this browser only; <b>Export</b> them as a CSV and send it to the site's analyst to fold
+  them into the review (<code>scripts/pyrocb_review_import.py</code>).</li>
+</ol>
+<div class="controls"><label>Reviewer <input id="who" size="10" placeholder="initials"></label>
+  <button type="button" class="chip" id="export">Export my calls (CSV)</button>
+  <label class="chip" style="cursor:pointer">Import calls <input type="file" id="import" accept=".csv" style="display:none"></label>
+  <span class="note" id="progress"></span></div>
+</div>
+
+<div class="card" data-guide="guide.html#st-review"><h2>Days to review</h2>
+<div id="browser"></div>
+</div>
+</div>
+<script src="data/site_data.js"></script><script src="charts.js"></script><script src="pages.js"></script>
+<script>
+PC.chrome("storms.html");
+const f = PC.fmt, KEY = "pyrocb-storm-review-v1";
+const VERDICTS = [["pyroCb", "PyroCb: a fire-rooted tower I can pick out"], ["pyroCu", "Fire plume under or beside the storms, not a pyroCb"],
+  ["storms", "Ambient storms only"], ["unsure", "Can't tell"]];
+let calls = {};
+try { calls = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { calls = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(calls)); } catch (e) { /* private window: calls last this visit */ } progress(); };
+const who = document.getElementById("who");
+try { who.value = localStorage.getItem(KEY + "-who") || ""; } catch (e) { /* ignore */ }
+who.addEventListener("change", () => { try { localStorage.setItem(KEY + "-who", who.value); } catch (e) { /* ignore */ } });
+const radar = Object.fromEntries((PYRO.radar_cases || []).map(c => [c.id, c]));
+const items = PYRO.days.filter(d => d.review_img || radar[d.id] || d.sounding_img)
+  .map(d => ({ ...d, reviewed_call: calls[d.id] ? calls[d.id].verdict : "" }));
+function progress() {
+  const amb = items.filter(d => d.cls === "ambiguous"), done = amb.filter(d => calls[d.id]).length;
+  const cb = Object.values(calls).filter(c => c.verdict === "pyroCb").length;
+  document.getElementById("progress").textContent = `${done} of ${amb.length} storm days called${cb ? ` · ${cb} called pyroCb` : ""}`;
+}
+const img = (src, alt) => `<img src="${src}" alt="${alt}" loading="lazy" style="width:100%;border-radius:6px;border:1px solid var(--ring);background:#fff">`;
+const B = PG.browser(document.getElementById("browser"), {
+  items, preset: "storms", featured: d => !calls[d.id], featuredLabel: "Not yet reviewed", stack: true,
+  keepFeatured: true, cell: (d, k) => k === "reviewed_call" ? (d.reviewed_call || "–") : undefined,
+  cols: [["day", "Day"], ["fire", "Fire"], ["cls", "Class"], ["growth_ac", "Growth (ac)"], ["fp_max_gw", "FP (GW)"], ["ratio_max", "FP/PFT"],
+    ["bt_rooted_min", "GOES top (°C)"], ["radar_rooted_top_km", "Radar top (km)"], ["reviewed_call", "My call"]],
+  pane: d => {
+    const r = radar[d.id], c = calls[d.id] || {};
+    return `<h3>${PG.fireLabel(d.fire)} · ${d.day} <span class="badge ${d.cls}">${PC.CLS_NAME[d.cls]}</span></h3>
+    <p class="note">Coldest fire-rooted GOES top ${d.bt_rooted_min !== null ? f(d.bt_rooted_min, 0) + " °C" : "–"} · peak fire power ${f(d.fp_max_gw, 0)} GW ·
+      PFT ${PG.pft(d)} · FP/PFT ${f(d.ratio_max, 2)} · PCAPE ${f(d.pcape_max_jkg, 0)} J/kg · growth ${f(d.growth_ac, 0)} ac ·
+      radar ${PYRO.fires[d.fire].radar}${PYRO.fires[d.fire].radar_usable ? "" : " (terrain clutter: read with care)"}${d.note ? `<br><b>Analyst review:</b> ${d.note}` : ""}</p>
+    <div class="card verdict" style="margin:10px 0"><b>Your call</b>
+      <div class="chips" style="margin:8px 0">${VERDICTS.map(([k, t]) => `<span class="chip ${c.verdict === k ? "on" : ""}" data-v="${k}">${t}</span>`).join("")}</div>
+      <div class="controls"><label>Confidence <select class="v-conf">${["", "low", "medium", "high"].map(x => `<option ${c.confidence === x ? "selected" : ""}>${x}</option>`).join("")}</select></label>
+        <label style="flex:1">Note <input class="v-note" style="flex:1;min-width:200px" value="${(c.note || "").replace(/"/g, "&quot;")}" placeholder="what you saw, scan time…"></label>
+        <button type="button" class="chip v-clear">Clear</button><span class="note v-saved">${c.at ? "saved " + c.at.slice(0, 16).replace("T", " ") : ""}</span></div></div>
+    ${d.review_img ? `<h3>GOES-West cloud tops around the coldest scan</h3>${img(d.review_img, "GOES 10.3 µm cloud-top panels for " + d.day)}` : `<p class="note">No GOES review panels for this day.</p>`}
+    ${r ? `<h3>Radar: the column over the fire (${r.radar})</h3>${img(r.img, "Radar reflectivity, echo top and vertical slices for " + d.day)}${r.th_img ? img(r.th_img, "The fire's radar column through the afternoon, " + d.day) : ""}`
+        : `<p class="note">No radar picture for this day (no radar within 200 km, or no volume near the tallest column).</p>`}
+    ${d.sounding_img ? `<h3>Sounding at the fire front</h3>${img(d.sounding_img, "Skew-T sounding for " + d.day)}` : ""}
+    <p class="note"><a href="explore.html?x=pft_min_gw&y=fp_max_gw&day=${d.id}">This day's numbers →</a> · <a href="fires.html?fire=${d.fire}">the whole fire</a></p>`;
+  },
+  afterPane: (el, d) => {
+    if (!d || !el.querySelector(".verdict")) return;
+    const rec = () => calls[d.id] || (calls[d.id] = { fire: d.fire, fire_day: d.day, auto_class: d.cls });
+    const stamp = () => { const c = rec(); c.reviewer = who.value; c.at = new Date().toISOString(); d.reviewed_call = c.verdict || ""; save();
+      el.querySelector(".v-saved").textContent = "saved " + c.at.slice(0, 16).replace("T", " ");
+      const row = document.querySelector(`.daylist tr[data-id="${d.id}"]`); if (row) row.lastElementChild.textContent = d.reviewed_call || "–"; };
+    el.querySelectorAll(".verdict .chip[data-v]").forEach(ch => ch.addEventListener("click", () => {
+      rec().verdict = ch.dataset.v; el.querySelectorAll(".verdict .chip[data-v]").forEach(x => x.classList.toggle("on", x === ch)); stamp(); }));
+    el.querySelector(".v-conf").addEventListener("change", e => { rec().confidence = e.target.value; stamp(); });
+    el.querySelector(".v-note").addEventListener("change", e => { rec().note = e.target.value; stamp(); });
+    el.querySelector(".v-clear").addEventListener("click", () => { delete calls[d.id]; d.reviewed_call = ""; save(); B.redraw(); });
+  },
+});
+const COLS = ["fire", "fire_day", "auto_class", "verdict", "confidence", "note", "reviewer", "at"];
+const q = v => `"${String(v === undefined || v === null ? "" : v).replace(/"/g, '""')}"`;
+document.getElementById("export").addEventListener("click", () => {
+  const rows = Object.values(calls).filter(c => c.verdict);
+  const csv = COLS.join(",") + "\n" + rows.map(c => COLS.map(k => q(c[k])).join(",")).join("\n") + "\n";
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  a.download = `pyrocb_storm_review_${(who.value || "anon").replace(/\W+/g, "")}_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+document.getElementById("import").addEventListener("change", async e => {
+  const file = e.target.files[0]; if (!file) return;
+  const lines = (await file.text()).trim().split(/\r?\n/), head = lines.shift().split(",");
+  const parse = l => { const out = []; let cur = "", inq = false;
+    for (let i = 0; i < l.length; i++) { const ch = l[i];
+      if (inq) { if (ch === '"' && l[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') inq = false; else cur += ch; }
+      else if (ch === '"') inq = true; else if (ch === ",") { out.push(cur); cur = ""; } else cur += ch; }
+    out.push(cur); return out; };
+  let n = 0;
+  for (const l of lines) { const v = parse(l), c = Object.fromEntries(head.map((h, i) => [h, v[i]]));
+    const id = `${c.fire}_${c.fire_day}`; if (c.verdict && PG.byId[id]) { calls[id] = c; n++; } }
+  items.forEach(d => d.reviewed_call = calls[d.id] ? calls[d.id].verdict : "");
+  save(); B.redraw(); alert(`${n} calls imported.`);
+});
+progress();
+</script></body></html>
